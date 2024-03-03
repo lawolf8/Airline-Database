@@ -24,9 +24,30 @@ CREATE TABLE Cabin(
 
 CREATE TABLE Customer(
     customerID INT AUTO_INCREMENT PRIMARY KEY,
-    fname VARCHAR(255) NOT NULL,
-    mname VARCHAR(255),
-    lname VARCHAR(255),
-    email VARCHAR(255), 
-    
+    fname VARCHAR(250) NOT NULL,
+    mname VARCHAR(250),
+    lname VARCHAR(250) NOT NULL,
+    email VARCHAR(250) NOT NULL, 
+    phonenumber VARCHAR(20),
+    dateofbirth DATE,
+    registration DATE,
+    airlinepoints INT DEFAULT 0,
+    registrationstatus BOOLEAN DEFAULT FALSE,
+    address VARCHAR(250)
 )
+
+CREATE TABLE Employee(
+    employeeID INT AUTO_INCREMENT PRIMARY KEY,
+    fname VARCHAR(250) NOT NULL,
+    mname VARCHAR(250),
+    lname VARCHAR(250) NOT NULL,
+    email VARCHAR(250) NOT NULL, 
+    phonenumber VARCHAR(20) NOT NULL,
+    dateofbirth DATE NOT NULL,
+    position VARCHAR(250) NOT NULL,
+    onboarddate DATE NOT NULL,
+    salary DECIMAL(10,2) NOT NULL,
+    serialnumber VARCHAR(250),
+    employeeLevel INT NOT NULL CHECK (employeeLevel BETWEEN 1 AND 10),
+    FOREIGN KEY (serialnumber) REFERENCES Airplane(serialnumber)
+);
