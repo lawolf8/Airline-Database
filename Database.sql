@@ -94,17 +94,18 @@ CREATE TABLE MaintenanceSchedule(
 
 -- Create table for Maintenance Records
 CREATE TABLE MaintenanceRecord(
-    record_id INT PRIMARY KEY,
+    record_id INT PRIMARY KEY,  --References MP table
     aircraft_id VARCHAR(250) NOT NULL,
     maintenancetype CHAR(3) NOT NULL,
     maintenance_date DATE,
-    description VARCHAR(255),
     parts_replaced VARCHAR(255),
     technicians VARCHAR(100) NOT NULL,
     labored_hours INT NOT NULL,
+    FOREIGN KEY (record_id) REFERENCES AircraftMaintenanceTask(task_id), 
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber),
     FOREIGN KEY (maintenancetype) REFERENCES MaintenanceSchedule(maintenancetype),
-    FOREIGN KEY (parts_used) REFERENCES UtilizedComponents(component_id)
+    FOREIGN KEY (parts_used) REFERENCES UtilizedComponents(component_id),
+    FOREIGN KEY (personnel_id) REFERENCES MaintenancePersonnel(employeeID)
 );
 
 -- Create table for Component Tracking
@@ -124,29 +125,32 @@ CREATE TABLE UtilizedComponents(
     FOREIGN KEY (component_id) REFERENCES partlibrary(component_id)
 );
 
-
 -- Create table for Maintenance Personnel Records
 CREATE TABLE MaintenancePersonnel(
-personnel_id INT PRIMARY KEY,
-name VARCHAR(100),
-qualification VARCHAR(100),
-certification VARCHAR(100)
+    employeeID INT PRIMARY KEY,
+    fname VARCHAR(250) NOT NULL,
+    lname VARCHAR(250) NOT NULL,
+    qualification VARCHAR(100),
+    certification VARCHAR(100),
+    FOREIGN KEY (employeeID) REFERENCES Employee(employeeID),
+    FOREIGN KEY (fname) REFERENCES Employee(fname),
+    FOREIGN KEY (lname) REFERENCES Employee(lname)
 );
 
 -- Create table for Maintenance Tasks
 CREATE TABLE MaintenanceTask (
-task_id INT PRIMARY KEY,
-task_name VARCHAR(100),
-description VARCHAR(255)
+    task_id INT PRIMARY KEY,
+    task_name VARCHAR(100),
+    mdescription VARCHAR(255)
 );
 
 -- Create table for Aircraft-MaintenanceTask Mapping
 CREATE TABLE AircraftMaintenanceTask (
-aircraft_id INT,
-task_id INT,
-PRIMARY KEY (aircraft_id, task_id),
-FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id),
-FOREIGN KEY (task_id) REFERENCES MaintenanceTask(task_id)
+    aircraft_id INT,
+    task_id INT,
+    PRIMARY KEY (aircraft_id, task_id),
+    FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber),
+    FOREIGN KEY (task_id) REFERENCES MaintenanceTask(task_id)
 );
 
 -- Create table for Maintenance Alerts and Notifications
