@@ -281,3 +281,20 @@ airport_name VARCHAR(255),
 city VARCHAR(100),
 country VARCHAR(100),
 );
+
+-- Create a table for ticket ID, and pricing
+Create Table Tickets (
+    Ticket_no Int Primary Key,
+    Ticket_Price Int,
+    FOREIGN KEY (flight_id, departure_date, departure_time) REFERENCES flight(flight_id, departure_date, departure_time),
+    );
+
+ -- Create a table for Discounts
+CREATE TABLE Discounts (
+    discount_percentage Int Primary Key,
+    discount_applied Int,
+    FOREIGN KEY (Ticket_no, Ticket_Price) REFERENCES Tickets(Ticket_no, Ticket_Price),
+    );
+
+    
+    
