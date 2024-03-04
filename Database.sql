@@ -23,7 +23,7 @@ CREATE TABLE Cabin(
     serialnumber VARCHAT(250) NOT NULL,
     cabinclass ENUM('Economy', 'Economy Regular', 'Economy Plus', 'Business', 'First Class'),
     seatcapacity INT NOT NULL,
-    ammenities TEXT,
+    ammenities VARCHAR(250),
     FOERIGN KEY (serialnumber) REFERENCES Airplane(serialnumber)
 );
 
