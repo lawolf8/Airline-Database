@@ -275,11 +275,11 @@ FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
 
 -- Create table for Airport Locations
 CREATE TABLE AirportLocations (
-airport_id Int PRIMARY KEY,
-airport_code VARCHAR(3) UNIQUE,
-airport_name VARCHAR(255),
-city VARCHAR(100),
-country VARCHAR(100),
+    airport_id Int PRIMARY KEY,
+    airport_code VARCHAR(3) UNIQUE,
+    airport_name VARCHAR(255),
+    city VARCHAR(100),
+    country VARCHAR(100),
 );
 
 -- Create a table for ticket ID, and pricing
