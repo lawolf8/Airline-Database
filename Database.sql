@@ -1,6 +1,6 @@
 /* 
 Commerical Airline Project
-Luke Wolf, Kyle Pterone, Reese Sleater, Michael Brennan
+Luke Wolf, Kyle Pterone, Reece Sleater, Michael Brennan
 */
 
 /*
