@@ -1,6 +1,6 @@
 /* 
 Commerical Airline Project
-Luke Wolf, Kyle Pterone, Reese Sleater, Michael Brennan
+Luke Wolf, Kyle Pterone, Reece Sleater, Michael Brennan
 */
 
 /*
@@ -274,4 +274,27 @@ CREATE TABLE Discounts (
     discount_percentage Int Primary Key,
     discount_applied Int,
     discounttype VARCHAR(50) NOT NULL,
+);
+
+-- Create table for Airport Services
+CREATE TABLE AirportServices (
+    service_id SERIAL PRIMARY KEY,
+    airport_id INT,
+    totallaborhours REAL NOT NULL,
+    employeeID INT,
+    service_name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (airport_id) REFERENCES AirportLocations(airport_id),
+    FOREIGN KEY (employeeID) REFERENCES Employee(employeeID)
+);
+
+CREATE TABLE CrewSchedulelog (
+    schedule_id SERIAL PRIMARY KEY,
+    flight_id INT,
+    employee_id INT NOT NULL,
+    duty_date DATE NOT NULL,
+    duty_shift_start TIME NOT NULL,
+    duty_shift_end TIME NOT NULL,
+    duty_type VARCHAR(50),
+    FOREIGN KEY (flight_id) REFERENCES Flight(flight_id),
+    FOREIGN KEY (employee_id) REFERENCES Employee(employeeID)
 );
