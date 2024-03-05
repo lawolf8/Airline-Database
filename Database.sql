@@ -275,6 +275,7 @@ CREATE TABLE Discounts (
     discount_applied Int,
     discounttype VARCHAR(50) NOT NULL,
 );
+<<<<<<< HEAD
 
 -- Create table for Airport Services
 CREATE TABLE AirportServices (
@@ -298,3 +299,5 @@ CREATE TABLE CrewSchedulelog (
     FOREIGN KEY (flight_id) REFERENCES Flight(flight_id),
     FOREIGN KEY (employee_id) REFERENCES Employee(employeeID)
 );
+=======
+>>>>>>> 128f3c87b71e45fcd6e7882216a1ebe2261fa209
