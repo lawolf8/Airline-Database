@@ -39,7 +39,7 @@ CREATE TABLE Customer(
     airlinepoints INT DEFAULT 0,
     registrationstatus BOOLEAN DEFAULT FALSE,
     caddress VARCHAR(250)
-)
+);
 
 CREATE TABLE Employee(
     employeeID INT AUTO_INCREMENT PRIMARY KEY,
@@ -80,7 +80,7 @@ CREATE TABLE partlibrary(
     procurement_date DATE,
     partlocation VARCHAR(250),
     FOREIGN KEY (manufacter) REFERENCES partmanufacter(manufacter),
-)
+);
 
 CREATE TABLE MaintenanceSchedule(
     schedule_id INT PRIMARY KEY,
@@ -267,11 +267,11 @@ Create Table Tickets (
     Ticketpriceafterdiscount REAL,
     FOREIGN KEY (flight_id) REFERENCES flight(flight_id),
     FOREIGN KEY (discount_percentage) REFERENCES Discounts(discount_percentage),
-    );
+);
 
  -- Create a table for Discounts
 CREATE TABLE Discounts (
     discount_percentage Int Primary Key,
     discount_applied Int,
     discounttype VARCHAR(50) NOT NULL,
-    );
+);
