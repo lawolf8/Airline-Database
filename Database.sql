@@ -14,7 +14,7 @@ CREATE TABLE Airplane(
     capacity INT NOT NULL,
     dateManufactured DATE NOT NULL,
     lastMaintenance DATE NOT NULL,
-    astatus ENUM('Active', 'Depot', 'Maintenance', 'Retired') NOT NULL, 
+    airstatus ENUM('Active', 'Depot', 'Maintenance', 'Retired') NOT NULL, 
     alocation VARCHAR(255)
 );
 
@@ -64,7 +64,7 @@ Maintence Tables
 */
 -- Create table for Maintenance Schedules
 --Create table for manufacter
-CREATE TABLE partmanufacter(
+CREATE TABLE manufacter(
     manufacter VARCHAR(250) NOT NULL PRIMARY KEY,
     memail VARCHAR(250) NOT NULL,
     mphone VARCHAR(250) NOT NULL, 
@@ -77,6 +77,8 @@ CREATE TABLE partlibrary(
     part_name VARCHAR(250), 
     numberofcompnentsstocked INT,
     endlifehours INT CHECK(endlifehours>0),
+    procurement_date DATE,
+    partlocation VARCHAR(250),
     FOREIGN KEY (manufacter) REFERENCES partmanufacter(manufacter),
 )
 
@@ -141,18 +143,18 @@ CREATE TABLE MaintenancePersonnel(
 CREATE TABLE MaintenanceTask (
     task_id INT PRIMARY KEY,
     task_name VARCHAR(100),
-    mdescription VARCHAR(255)
+    mdescription VARCHAR(250)
 );
 
 -- Create table for Aircraft-MaintenanceTask Mapping
 CREATE TABLE AircraftMaintenanceTask (
-    aircraft_id INT,
+    aircraft_id VARCHAR(250),
     task_id INT,
     PRIMARY KEY (aircraft_id, task_id),
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber),
     FOREIGN KEY (task_id) REFERENCES MaintenanceTask(task_id)
 );
-
+/*
 -- Create table for Maintenance Alerts and Notifications
 CREATE TABLE MaintenanceAlert (
 alert_id INT PRIMARY KEY,
@@ -162,120 +164,93 @@ alert_date DATE,
 description VARCHAR(255),
 FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
 );
-
--- Create table for Inventory Management
-CREATE TABLE Inventory (
-inventory_id INT PRIMARY KEY,
-part_name VARCHAR(100),
-quantity INT,
-location VARCHAR(100),
-procurement_date DATE
+*/
+-- Create table for Inventory Management (Food, paper, etc)
+CREATE TABLE SupplyInventory (
+    inventory_id INT PRIMARY KEY,
+    supply_name VARCHAR(100),
+    supplier VARCHAR(200),
+    quantity INT,
+    slocation VARCHAR(100),
+    procurement_date DATE,
+    FOREIGN KEY supplier REFERENES manufacter(manufacter)
 );
 
 -- Create table for Compliance and Regulatory Data
 CREATE TABLE Compliance (
-compliance_id INT PRIMARY KEY,
-aircraft_id INT,
-document_type VARCHAR(50),
-document_number VARCHAR(50),
-compliance_date DATE,
-expiration_date DATE,
-FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
+    compliance_id INT PRIMARY KEY,
+    aircraft_id VARCHAR(250),
+    document_type VARCHAR(50),
+    document_number VARCHAR(50), --Unique?
+    compliance_date DATE,
+    expiration_date DATE,
+    FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
 
 -- Create table for Aircraft Health Monitoring
 CREATE TABLE HealthMonitoring (
-monitoring_id INT PRIMARY KEY,
-aircraft_id INT,
-monitoring_date DATE,
-system_name VARCHAR(100),
-status VARCHAR(20),
-FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
+    monitoring_id INT PRIMARY KEY, --DIFF between this and part monitor?
+    partmonitor_id INT,
+    aircraft_id VARHCAR(250),
+    monitoring_date DATE,
+    system_name VARCHAR(100),
+    astatus VARCHAR(20),  --Same as airplane status?
+    healthdate DATE,
+    FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber),
+    FOREIGN KEY (partmonitor_id) REFERENCES UtilizedComponents(component_id)
 );
 -- Create table for Incident and Accident Reports
 CREATE TABLE Incident (
-incident_id INT PRIMARY KEY,
-aircraft_id INT,
-incident_date DATE,
-description VARCHAR(255),
-investigation_status VARCHAR(50),
-FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
+    incident_id INT PRIMARY KEY,
+    aircraft_id VARHCAR(250),
+    incident_date DATE,
+    idescription VARCHAR(250),
+    investigation_status VARCHAR(50),
+    FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
 
 -- Create table for Reliability and Performance Metrics
 CREATE TABLE PerformanceMetrics (
-metric_id INT PRIMARY KEY,
-aircraft_id INT,
-metric_name VARCHAR(100),
-value DECIMAL(10,2),
-metric_date DATE,
-FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
+    metric_id INT PRIMARY KEY,
+    aircraft_id VARHCAR(250),
+    metric_name VARCHAR(100),
+    PMvalue DECIMAL(10,2),
+    metric_date DATE,
+    FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
--- Create table for Routes
-CREATE TABLE Route (
-route_id INT PRIMARY KEY,
-origin VARCHAR(100),
-destination VARCHAR(100),
-day_of_week VARCHAR(10),
-schedule_time TIME
-);
-
 /*
 Routes Tables
 */
-CREATE TABLE Route (
-route_id INT PRIMARY KEY,
-origin VARCHAR(100),
-destination VARCHAR(100),
-day_of_week VARCHAR(10),
-schedule_time TIME
+CREATE TABLE aRoute (
+    route_id INT PRIMARY KEY,
+    origin VARCHAR(100) NOT NULL,
+    destination VARCHAR(100) NOT NULL,
+    day_of_week VARCHAR(9),
+    triplength DECIMAL(10,2) NOT NULL,
+    model VARCHAR(250) NOT NULL,
+    FOREIGN KEY model REFERENCES Airplane(model)
 );
 
 -- Create the Flight table with composite primary key
 CREATE TABLE Flight (
-flight_id INT,
-route_id INT,
-aircraft_id INT,
-departure_date DATE,
-departure_time TIME,
-arrival_date DATE,
-arrival_time TIME,
-PRIMARY KEY (flight_id, departure_date, departure_time),
-FOREIGN KEY (route_id) REFERENCES Route(route_id),
-FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
-);
-
-/*
-Routes and Schedules
-*/
--- Create table for Routes
-CREATE TABLE Route (
-route_id INT PRIMARY KEY,
-origin_id int,
-destination_id int,
-day_of_week VARCHAR(10),
-schedule_time TIME,
-FOREIGN KEY (origin_id) REFERENCES AirportLocations(Airport_id),
-FOREIGN KEY (destination_id) REFERENCES AirportLocations(Airport_id)
-);
-
--- Create the Flight table with composite primary key
-CREATE TABLE Flight (
-flight_id INT,
-route_id INT,
-aircraft_id INT,
-departure_date DATE,
-departure_time TIME,
-arrival_date DATE,
-arrival_time TIME,
-PRIMARY KEY (flight_id, departure_date, departure_time),
-FOREIGN KEY (route_id) REFERENCES Route(route_id),
-FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
+    flight_id INT PRIMARY KEY,
+    route_id INT NOT NULL,
+    aircraft_id INT NOT NULL,
+    departurelocation VARCHAR(250) NOT NULL,
+    departure_date DATE NOT NULL,
+    departure_time TIME,
+    arrivallocation VARCHAR(250) NOT NULL,
+    arrival_date DATE NOT NULL,
+    arrival_time TIME,
+    flightlength INT, 
+    FOREIGN KEY (departurelocation, arrivallocation) REFERENCES AirportLocations(airport_id),
+    FOREIGN KEY (route_id) REFERENCES aRoute(route_id),
+    FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
 
 -- Create table for Airport Locations
 CREATE TABLE AirportLocations (
-    airport_id Int PRIMARY KEY,
+    airport_id CHAR(3) PRIMARY KEY,
     airport_code VARCHAR(3) UNIQUE,
     airport_name VARCHAR(255),
     city VARCHAR(100),
@@ -285,16 +260,18 @@ CREATE TABLE AirportLocations (
 -- Create a table for ticket ID, and pricing
 Create Table Tickets (
     Ticket_no Int Primary Key,
-    Ticket_Price Int,
-    FOREIGN KEY (flight_id, departure_date, departure_time) REFERENCES flight(flight_id, departure_date, departure_time),
+    Ticket_Price REAL NOT NULL,
+    flight_id INT NOT NULL,
+    CABINCLASS ENUM('Active', 'Depot', 'Maintenance', 'Retired') NOT NULL,
+    Discount_percentage INT, 
+    Ticketpriceafterdiscount REAL,
+    FOREIGN KEY (flight_id) REFERENCES flight(flight_id),
+    FOREIGN KEY (discount_percentage) REFERENCES Discounts(discount_percentage),
     );
 
  -- Create a table for Discounts
 CREATE TABLE Discounts (
     discount_percentage Int Primary Key,
     discount_applied Int,
-    FOREIGN KEY (Ticket_no, Ticket_Price) REFERENCES Tickets(Ticket_no, Ticket_Price),
+    discounttype VARCHAR(50) NOT NULL,
     );
-
-    
-    
