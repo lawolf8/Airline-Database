@@ -41,6 +41,13 @@ CREATE TABLE Customer(
     caddress VARCHAR(250)
 );
 
+CREATE TABLE Customerblacklist(
+    customerID INT AUTO_INCREMENT PRIMARY KEY,
+    reason VARCHAR(250)
+    dateofbl DATE,
+    FOREIGN KEY (customerID) REFERENCES Customer(customerID)
+)
+
 CREATE TABLE Employee(
     employeeID INT AUTO_INCREMENT PRIMARY KEY,
     fname VARCHAR(250) NOT NULL,
@@ -65,10 +72,16 @@ Maintence Tables
 -- Create table for Maintenance Schedules
 --Create table for manufacter
 CREATE TABLE manufacter(
-    manufacter VARCHAR(250) NOT NULL PRIMARY KEY,
-    memail VARCHAR(250) NOT NULL,
-    mphone VARCHAR(250) NOT NULL, 
+    manufacter VARCHAR(250) PRIMARY KEY,
+    contact_name VARCHAR(100),
+    contact_email VARCHAR(100) NOT NULL,
+    contact_phone VARCHAR(20) NOT NULL,
+    maddress VARCHAR(255),
+    city VARCHAR(100),
+    country VARCHAR(100)
 );
+
+
 
 --Table for number of parts stocked
 CREATE TABLE partlibrary(
@@ -298,3 +311,5 @@ CREATE TABLE CrewSchedulelog (
     FOREIGN KEY (flight_id) REFERENCES Flight(flight_id),
     FOREIGN KEY (employee_id) REFERENCES Employee(employeeID)
 );
+
+
