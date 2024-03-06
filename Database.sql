@@ -3,11 +3,9 @@ Commerical Airline Project
 Luke Wolf, Kyle Pterone, Reece Sleater, Michael Brennan
 */
 
-/*
-"High Level" Tables
-*/
+-- Airplane Identification
 CREATE TABLE Airplane(
-    serialnumber VARCHAR(250) PRIMARY KEY,  -- Serial Number Primary Key
+    serialnumber VARCHAR(250) PRIMARY KEY,
     manufacturerserialnumber VARCHAR(250) PRIMARY KEY,
     model VARCHAR(250) NOT NULL,
     manufacturer VARCHAR(250) NOT NULL,
@@ -18,6 +16,7 @@ CREATE TABLE Airplane(
     alocation VARCHAR(255)
 );
 
+-- Cabin Information
 CREATE TABLE Cabin(
     cabinID INT AUTO_INCREMENT PRIMARY KEY, 
     serialnumber VARCHAT(250) NOT NULL,
@@ -27,6 +26,7 @@ CREATE TABLE Cabin(
     FOERIGN KEY (serialnumber) REFERENCES Airplane(serialnumber)
 );
 
+-- Customer Information
 CREATE TABLE Customer(
     customerID INT AUTO_INCREMENT PRIMARY KEY,
     fname VARCHAR(250) NOT NULL,
@@ -41,13 +41,15 @@ CREATE TABLE Customer(
     caddress VARCHAR(250)
 );
 
+-- Customer Black List
 CREATE TABLE Customerblacklist(
     customerID INT AUTO_INCREMENT PRIMARY KEY,
-    reason VARCHAR(250)
+    reason VARCHAR(250),
     dateofbl DATE,
     FOREIGN KEY (customerID) REFERENCES Customer(customerID)
 )
 
+-- Employee List
 CREATE TABLE Employee(
     employeeID INT AUTO_INCREMENT PRIMARY KEY,
     fname VARCHAR(250) NOT NULL,
@@ -62,15 +64,12 @@ CREATE TABLE Employee(
     serialnumber VARCHAR(250),
     employeeLevel INT NOT NULL CHECK (employeeLevel BETWEEN 1 AND 10),
     airplanes VARCHAR(250),
+    employementstatus BOOLEAN NOT NULL,
     FOREIGN KEY (serialnumber) REFERENCES Airplane(serialnumber),
     FOREIGN KEY (airplanes) REFERENCES Airplanes(model)
 );
 
-/*
-Maintence Tables
-*/
--- Create table for Maintenance Schedules
---Create table for manufacter
+--Manufacter Information
 CREATE TABLE manufacter(
     manufacter VARCHAR(250) PRIMARY KEY,
     contact_name VARCHAR(100),
@@ -81,9 +80,7 @@ CREATE TABLE manufacter(
     country VARCHAR(100)
 );
 
-
-
---Table for number of parts stocked
+--Parts Library
 CREATE TABLE partlibrary(
     component_id INT PRIMARY KEY,
     manufacter VARCHAR(250) NOT NULL,
@@ -95,6 +92,7 @@ CREATE TABLE partlibrary(
     FOREIGN KEY (manufacter) REFERENCES partmanufacter(manufacter),
 );
 
+--Scheduled Maintenance
 CREATE TABLE MaintenanceSchedule(
     schedule_id INT PRIMARY KEY,
     aircraft_id VARCHAR(250) NOT NULL,
@@ -107,7 +105,7 @@ CREATE TABLE MaintenanceSchedule(
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
 
--- Create table for Maintenance Records
+--Maintenance Records
 CREATE TABLE MaintenanceRecord(
     record_id INT PRIMARY KEY,  --References MP table
     aircraft_id VARCHAR(250) NOT NULL,
@@ -123,7 +121,7 @@ CREATE TABLE MaintenanceRecord(
     FOREIGN KEY (personnel_id) REFERENCES MaintenancePersonnel(employeeID)
 );
 
--- Create table for Component Tracking
+--Component/Parts Tracking
 CREATE TABLE UtilizedComponents(
     component_id INT,
     aircraft_id VARCHAR(250),
@@ -140,7 +138,7 @@ CREATE TABLE UtilizedComponents(
     FOREIGN KEY (component_id) REFERENCES partlibrary(component_id)
 );
 
--- Create table for Maintenance Personnel Records
+--Maintenance Personnel Records (Uses employee info)
 CREATE TABLE MaintenancePersonnel(
     employeeID INT PRIMARY KEY,
     fname VARCHAR(250) NOT NULL,
@@ -152,18 +150,18 @@ CREATE TABLE MaintenancePersonnel(
     FOREIGN KEY (lname) REFERENCES Employee(lname)
 );
 
--- Create table for Maintenance Tasks
+-- Maintenance Tasks
 CREATE TABLE MaintenanceTask (
     task_id INT PRIMARY KEY,
     task_name VARCHAR(100),
-    mdescription VARCHAR(250)
+    mdescription VARCHAR(250),
+    task_status BOOLEAN
 );
 
--- Create table for Aircraft-MaintenanceTask Mapping
+-- Aircraft-MaintenanceTask Mapping  ***WHAT IS THE POINT OF THIS?
 CREATE TABLE AircraftMaintenanceTask (
-    aircraft_id VARCHAR(250),
-    task_id INT,
-    PRIMARY KEY (aircraft_id, task_id),
+    aircraft_id VARCHAR(250), --NOT PRIMARY KEY
+    task_id INT PRIMARY KEY (task_id),
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber),
     FOREIGN KEY (task_id) REFERENCES MaintenanceTask(task_id)
 );
@@ -178,7 +176,7 @@ description VARCHAR(255),
 FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id)
 );
 */
--- Create table for Inventory Management (Food, paper, etc)
+--Inventory Management (Food, paper, etc)
 CREATE TABLE SupplyInventory (
     inventory_id INT PRIMARY KEY,
     supply_name VARCHAR(100),
@@ -189,7 +187,7 @@ CREATE TABLE SupplyInventory (
     FOREIGN KEY supplier REFERENES manufacter(manufacter)
 );
 
--- Create table for Compliance and Regulatory Data
+--Compliance and Regulatory Data
 CREATE TABLE Compliance (
     compliance_id INT PRIMARY KEY,
     aircraft_id VARCHAR(250),
@@ -200,7 +198,7 @@ CREATE TABLE Compliance (
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
 
--- Create table for Aircraft Health Monitoring
+--Aircraft Health (Status) Monitoring
 CREATE TABLE HealthMonitoring (
     monitoring_id INT PRIMARY KEY, --DIFF between this and part monitor?
     partmonitor_id INT,
@@ -212,7 +210,7 @@ CREATE TABLE HealthMonitoring (
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber),
     FOREIGN KEY (partmonitor_id) REFERENCES UtilizedComponents(component_id)
 );
--- Create table for Incident and Accident Reports
+-- Incident and Accident Reports
 CREATE TABLE Incident (
     incident_id INT PRIMARY KEY,
     aircraft_id VARHCAR(250),
@@ -222,7 +220,7 @@ CREATE TABLE Incident (
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
 
--- Create table for Reliability and Performance Metrics
+-- Reliability and Performance Metrics
 CREATE TABLE PerformanceMetrics (
     metric_id INT PRIMARY KEY,
     aircraft_id VARHCAR(250),
@@ -231,9 +229,8 @@ CREATE TABLE PerformanceMetrics (
     metric_date DATE,
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
-/*
-Routes Tables
-*/
+
+-- Routes Tables
 CREATE TABLE aRoute (
     route_id INT PRIMARY KEY,
     origin VARCHAR(100) NOT NULL,
@@ -244,7 +241,7 @@ CREATE TABLE aRoute (
     FOREIGN KEY model REFERENCES Airplane(model)
 );
 
--- Create the Flight table with composite primary key
+-- Flights
 CREATE TABLE Flight (
     flight_id INT PRIMARY KEY,
     route_id INT NOT NULL,
@@ -261,7 +258,7 @@ CREATE TABLE Flight (
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
 
--- Create table for Airport Locations
+-- Airport Locations
 CREATE TABLE AirportLocations (
     airport_id CHAR(3) PRIMARY KEY,
     airport_code VARCHAR(3) UNIQUE,
@@ -270,7 +267,7 @@ CREATE TABLE AirportLocations (
     country VARCHAR(100),
 );
 
--- Create a table for ticket ID, and pricing
+-- Tickets
 Create Table Tickets (
     Ticket_no Int Primary Key,
     Ticket_Price REAL NOT NULL,
@@ -282,14 +279,14 @@ Create Table Tickets (
     FOREIGN KEY (discount_percentage) REFERENCES Discounts(discount_percentage),
 );
 
- -- Create a table for Discounts
+ -- Discounts
 CREATE TABLE Discounts (
     discount_percentage Int Primary Key,
     discount_applied Int,
     discounttype VARCHAR(50) NOT NULL,
 );
 
--- Create table for Airport Services
+-- Airport Services
 CREATE TABLE AirportServices (
     service_id SERIAL PRIMARY KEY,
     airport_id INT,
@@ -300,6 +297,7 @@ CREATE TABLE AirportServices (
     FOREIGN KEY (employeeID) REFERENCES Employee(employeeID)
 );
 
+-- Crew Scheduling
 CREATE TABLE CrewSchedulelog (
     schedule_id SERIAL PRIMARY KEY,
     flight_id INT,
@@ -311,5 +309,3 @@ CREATE TABLE CrewSchedulelog (
     FOREIGN KEY (flight_id) REFERENCES Flight(flight_id),
     FOREIGN KEY (employee_id) REFERENCES Employee(employeeID)
 );
-
-
