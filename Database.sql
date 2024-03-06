@@ -64,6 +64,12 @@ CREATE TABLE Customerblacklist (
     FOREIGN KEY (customerID) REFERENCES Customer(customerID)
 );
 
+-- Position Table
+CREATE TABLE Position (
+    positionID INT IDENTITY(1,1) PRIMARY KEY,
+    position VARCHAR(250) NOT NULL
+);
+
 -- Employee Table
 CREATE TABLE Employee (
     employeeID INT IDENTITY(1,1) PRIMARY KEY,
@@ -79,12 +85,6 @@ CREATE TABLE Employee (
     employeeLevel INT NOT NULL CHECK (employeeLevel BETWEEN 1 AND 10),
     employementstatus BIT NOT NULL,
     FOREIGN KEY (positionID) REFERENCES Position(positionID)
-);
-
--- Position Table
-CREATE TABLE Position (
-    positionID INT IDENTITY(1,1) PRIMARY KEY,
-    position VARCHAR(250) NOT NULL
 );
 
 -- EmployeeAirplane (managing many-to-many relationship between Employee and Airplane)
@@ -190,7 +190,7 @@ CREATE TABLE MaintenanceTask (
 CREATE TABLE AircraftMaintenanceTask (
     aircraft_id VARCHAR(250),
     task_id INT,
-    PRIMARY KEY (aircraft_id, task_id), -- Corrected to use a composite primary key
+    PRIMARY KEY (aircraft_id, task_id),
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber),
     FOREIGN KEY (task_id) REFERENCES MaintenanceTask(task_id)
 );
@@ -199,7 +199,7 @@ CREATE TABLE AircraftMaintenanceTask (
 CREATE TABLE SupplyInventory (
     inventory_id INT PRIMARY KEY,
     supply_name VARCHAR(100),
-    supplier VARCHAR(200),
+    supplier VARCHAR(250),
     quantity INT,
     slocation VARCHAR(100),
     procurement_date DATE,
@@ -265,7 +265,7 @@ CREATE TABLE aRoute (
 CREATE TABLE Flight (
     flight_id INT PRIMARY KEY,
     route_id INT NOT NULL,
-    aircraft_id VARCHAR(250) NOT NULL, -- Corrected data type to match Airplane(serialnumber)
+    aircraft_id VARCHAR(250) NOT NULL,
     departure_date DATE NOT NULL,
     departure_time TIME,
     arrival_date DATE NOT NULL,
