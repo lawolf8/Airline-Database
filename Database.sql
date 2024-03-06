@@ -1,6 +1,7 @@
 /* 
 Commerical Airline Project
 Luke Wolf, Kyle Pterone, Reece Sleater, Michael Brennan
+ALL TABLES ARE VERIFIED IN 3RD NORMAL FORM
 */
 
 -- Airplane Identification
@@ -300,7 +301,7 @@ CREATE TABLE AirportServices (
 -- Crew Scheduling
 CREATE TABLE CrewSchedulelog (
     schedule_id SERIAL PRIMARY KEY,
-    flight_id INT,
+    flight_id INT, --Does not need to be on a flight
     employee_id INT NOT NULL,
     duty_date DATE NOT NULL,
     duty_shift_start TIME NOT NULL,
