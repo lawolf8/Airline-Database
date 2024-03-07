@@ -1,5 +1,6 @@
 /* 
 Commerical Airline Project
+GROUP 8
 Luke Wolf, Kyle Pterone, Reece Sleater, Michael Brennan
 ALL TABLES ARE VERIFIED IN 3RD NORMAL FORM
 */
