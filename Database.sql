@@ -284,6 +284,14 @@ CREATE TABLE AirportLocations (
     country VARCHAR(100)
 );
 
+ -- Discounts
+CREATE TABLE Discounts (
+    discount_percentage INT PRIMARY KEY,
+    discount_applied INT,
+    discount_type VARCHAR(50) NOT NULL 
+    
+);
+
 -- Tickets
 CREATE TABLE Tickets (
     ticket_no INT PRIMARY KEY,
@@ -294,14 +302,10 @@ CREATE TABLE Tickets (
     ticketpriceafterdiscount REAL,
     FOREIGN KEY (flight_id) REFERENCES Flight(flight_id),
     FOREIGN KEY (classID) REFERENCES CabinClass(classID)
+    FOREIGN KEY (discount_applied) REFERENCES Discounts(discount_applied)
 );
 
- -- Discounts
-CREATE TABLE Discounts (
-    discount_percentage INT PRIMARY KEY,
-    discount_applied INT,
-    discount_type VARCHAR(50) NOT NULL 
-);
+
 
 -- Airport Services
 CREATE TABLE AirportServices (
