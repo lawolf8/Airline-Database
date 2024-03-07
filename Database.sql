@@ -221,14 +221,13 @@ CREATE TABLE Compliance (
 CREATE TABLE HealthMonitoring (
     monitoring_id INT PRIMARY KEY,
     partmonitor_id INT,
-    aircraft_id VARCHAR(250), 
+    aircraft_id VARCHAR(250),
     monitoring_date DATE,
     system_name VARCHAR(100),
-    airstatus INT NOT NULL, 
+    airstatus INT NOT NULL,
     healthdate DATE,
-    FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber),
-    FOREIGN KEY (partmonitor_id) REFERENCES UtilizedComponents(component_id),
-    FOREIGN KEY (airstatus) REFERENCES AircraftStatus(statusID)
+    FOREIGN KEY (aircraft_id, partmonitor_id) REFERENCES UtilizedComponents(aircraft_id, component_id),
+    --FOREIGN KEY (airstatus) REFERENCES AircraftStatus(statusID)
 );
 
 -- Incident and Accident Reports
