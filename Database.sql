@@ -226,8 +226,8 @@ CREATE TABLE HealthMonitoring (
     system_name VARCHAR(100),
     airstatus INT NOT NULL,
     healthdate DATE,
-    FOREIGN KEY (aircraft_id, partmonitor_id) REFERENCES UtilizedComponents(aircraft_id, component_id),
-    --FOREIGN KEY (airstatus) REFERENCES AircraftStatus(statusID)
+    FOREIGN KEY (partmonitor_id, aircraft_id) REFERENCES UtilizedComponents(component_id, aircraft_id),
+    FOREIGN KEY (airstatus) REFERENCES AircraftStatus(statusID)
 );
 
 -- Incident and Accident Reports
@@ -235,7 +235,7 @@ CREATE TABLE Incident (
     incident_id INT PRIMARY KEY,
     aircraft_id VARCHAR(250),
     incident_date DATE,
-    description VARCHAR(250), 
+    idescription VARCHAR(250), 
     investigation_status VARCHAR(50),
     FOREIGN KEY (aircraft_id) REFERENCES Airplane(serialnumber)
 );
