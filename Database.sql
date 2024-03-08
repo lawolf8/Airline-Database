@@ -301,11 +301,9 @@ CREATE TABLE Tickets (
     discount_percentage INT,
     ticketpriceafterdiscount REAL,
     FOREIGN KEY (flight_id) REFERENCES Flight(flight_id),
-    FOREIGN KEY (classID) REFERENCES CabinClass(classID)
+    FOREIGN KEY (classID) REFERENCES CabinClass(classID),
     FOREIGN KEY (discount_applied) REFERENCES Discounts(discount_applied)
 );
-
-
 
 -- Airport Services
 CREATE TABLE AirportServices (
