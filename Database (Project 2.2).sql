@@ -23,7 +23,7 @@ FROM (
 ) AS Query_2;
 
 --Query 3
-SELECT MAX(finalprices) AS MaxTotalRevenue, MIN(finalprices) AS MinTotalRevenue
+SELECT R.route_id, MAX(finalprices) AS MaxTotalRevenue, MIN(finalprices) AS MinTotalRevenue
 FROM (
     SELECT R.route_id, SUM(T.final_price) AS finalprices
     FROM Tickets T
@@ -32,3 +32,15 @@ FROM (
     WHERE F.date BETWEEN '2017-01-01' AND '2017-12-31'
     GROUP BY R.route_id
 ) AS Query_3;
+
+--Query 20
+SELECT R.route_ID, MAX(ticketcount) AS MostUsedRouteOnWeekends
+FROM (
+    SELECT COUNT(T.ticket_id) AS ticketcount
+    FROM Tickets T
+    JOIN flights F ON T.flight_id = F.flight_id
+    JOIN routes R ON F.route_id = R.route_id
+    JOIN weekdays W ON R.weekday_id=W.weekday_id
+    WHERE W.weekday_ID IN (6,7) AND F.date BETWEEN '2017-01-01' AND '2017-12-31'
+    GROUP BY R.route_id
+) AS Query_20;
