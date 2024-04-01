@@ -33,7 +33,30 @@ FROM (
     GROUP BY R.route_id
 ) AS Query_3;
 
+--Query 4
 
+
+--Query 5 (Unsure what would be registered/non-registered)
+SELECT
+FROM(
+    SELECT C.
+) AS Query_5;
+
+--Query 6
+SELECT W.weekday AS DayOfWeek, R.route_id, COUNT(T.ticket_id) AS TicketsSold
+FROM (
+    SELECT *
+    FROM Tickets T
+    JOIN flights F ON T.flight_id = F.flight_id
+    JOIN routes R ON F.route_id = R.route_id
+    JOIN weekdays W ON R.weekday_id = W.weekday_id
+    WHERE R.city_state_id_origin = (SELECT city_state_id FROM cities_states WHERE name = 'Tampa')
+    AND R.city_state_id_destination = (SELECT city_state_id FROM cities_states WHERE name = 'Orlando')
+    GROUP BY W.weekday, R.route_id
+    ORDER BY W.weekday, TicketsSold DESC
+) AS Query_6;
+
+--Query 7
 
 
 --14 What was the most used payment type for tickets sold in 2017?
@@ -107,5 +130,4 @@ FROM (
     JOIN weekdays W ON R.weekday_id=W.weekday_id
     WHERE W.weekday_ID IN (6,7) AND F.date BETWEEN '2017-01-01' AND '2017-12-31'
     GROUP BY R.route_id
-
 ) AS Query_20;
