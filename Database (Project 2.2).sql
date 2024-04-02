@@ -108,8 +108,23 @@ GROUP BY
     f.flight_id, f.date, p.capacity
 HAVING 
     COUNT(t.ticket_id) < p.capacity * 0.25;
+	
 --(9)
-
+  SELECT 
+	month(purchase_date) AS month
+	count(*) AS tickets_sold
+  FROM 
+	tickets t
+  WHERE YEAR(purchase_date) = 2017
+  GROUP BY month(purchase_date)
+)
+SELECT *
+FROM monthly_sales
+WHERE tickets_sold IN (
+  SELECT MIN(tickets_sold) AS min_sales FROM monthly_sales
+  UNION ALL
+  SELECT MAX(tickets_sold) AS max_sales FROM monthly_sales
+);
 
 --(10) What are the three employees that have sold the most tickets in 2017?
 SELECT TOP 3
