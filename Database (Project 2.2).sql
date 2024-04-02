@@ -59,6 +59,40 @@ FROM (
 --Query 7
 
 
+--(10) What are the three employees that have sold the most tickets in 2017?
+SELECT TOP 3
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    COUNT(t.ticket_id) AS num_tickets_sold
+FROM 
+    employees e
+INNER JOIN 
+    tickets t ON e.employee_id = t.employee_id
+WHERE 
+    YEAR(t.purchase_date) = 2017
+GROUP BY 
+    e.employee_id, e.first_name, e.last_name
+ORDER BY 
+    COUNT(t.ticket_id) DESC;
+
+
+-- (11) What was the most demanded cabin type for tickets sold in 2017?
+SELECT TOP 1
+    ct.name AS cabin_type,
+    COUNT(t.ticket_id) AS num_tickets_sold
+FROM 
+    tickets t
+INNER JOIN 
+    cabin_types ct ON t.cabin_type_id = ct.cabin_type_id
+WHERE 
+    YEAR(t.purchase_date) = 2017
+GROUP BY 
+    ct.name
+ORDER BY 
+    COUNT(t.ticket_id) DESC;
+
+
 
 --(12) What is the purchase location in which most tickets were sold in 2016?
 SELECT TOP 1
@@ -74,6 +108,9 @@ GROUP BY
     loc.name
 ORDER BY 
     COUNT(t.ticket_id) DESC;
+
+
+
 
 --(Query 13)
  SELECT f.flight_id,
