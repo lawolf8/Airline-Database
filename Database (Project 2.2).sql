@@ -59,6 +59,32 @@ FROM (
 --Query 7
 
 
+
+--(12) What is the purchase location in which most tickets were sold in 2016?
+SELECT TOP 1
+    loc.name AS purchase_location,
+    COUNT(t.ticket_id) AS num_tickets_sold
+FROM 
+    tickets t
+INNER JOIN 
+    locations loc ON t.purchase_location_id = loc.location_id
+WHERE 
+    YEAR(t.purchase_date) = 2016
+GROUP BY 
+    loc.name
+ORDER BY 
+    COUNT(t.ticket_id) DESC;
+
+--(Query 13)
+ SELECT f.flight_id,
+       p.capacity AS plane_capacity,
+       COUNT(t.ticket_id) AS sold_tickets
+FROM flights f
+INNER JOIN planes p ON f.plane_id = p.plane_id
+LEFT JOIN tickets t ON f.flight_id = t.flight_id
+GROUP BY f.flight_id, p.capacity
+HAVING COUNT(t.ticket_id) = p.capacity;
+
 --14 What was the most used payment type for tickets sold in 2017?
 SELECT TOP 1
     pt.name AS payment_type,
