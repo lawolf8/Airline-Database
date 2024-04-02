@@ -34,7 +34,26 @@ FROM (
 ) AS Query_3;
 
 --Query 4
-
+--4.1
+select count(*) 'Elderly Discount', sum(total_discount) total_discount
+from
+(select (final_price*( select percentage from discounts
+where name='Elderly Discount')) total_discount
+from tickets ti
+where ti.customer_id in
+(select customer_id from customers where
+datediff(year,birth_date,purchase_date)>=65;
+--4.2
+select count(*) 'Student Discount', sum(total_discount) total_discount
+from
+(select (final_price*( select percentage from discounts
+where name='Student Discount')) total_discount
+from tickets ti
+where ti.customer_id in
+(select customer_id from customers where
+datediff(year,birth_date,purchase_date)between 16 and 23);
+	
+	
 
 --Query 5 (Unsure what would be registered/non-registered)
 SELECT
