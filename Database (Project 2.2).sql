@@ -1,4 +1,4 @@
---Group 8: Luke Wolf, Kyle Petrone, Michael Brennan, Reese Sleater
+--Group 8: Luke Wolf, Kyle Petrone, Michael Brennan, Reece Sleater
 --Query 1
 SELECT COUNT(*) AS QueryCountCapacity
 FROM (
@@ -57,6 +57,39 @@ FROM (
 ) AS Query_6;
 
 --Query 7
+SELECT r.route_id,
+       w.name AS weekday,
+       HOUR(t.purchase_time) AS hour_of_day,
+       COUNT(*) AS num_tickets_sold
+FROM tickets t
+JOIN flights f ON t.flight_id = f.flight_id
+JOIN routes r ON f.route_id = r.route_id
+JOIN weekdays w ON r.weekday_id = w.weekday_id
+WHERE r.city_state_id_origin = (SELECT city_state_id FROM cities_states WHERE name = 'Orlando')
+  AND r.city_state_id_destination = (SELECT city_state_id FROM cities_states WHERE name = 'Tampa')
+GROUP BY r.route_id, w.name, HOUR(t.purchase_time)
+ORDER BY r.route_id, w.name, num_tickets_sold DESC;
+
+--(8)
+SELECT 
+    f.flight_id,
+    f.date AS departure_date,
+    COUNT(t.ticket_id) AS num_tickets_sold,
+    p.capacity AS plane_capacity,
+    p.capacity * 0.25 AS min_required_tickets
+FROM 
+    flights f
+JOIN 
+    planes p ON f.plane_id = p.plane_id
+LEFT JOIN 
+    tickets t ON f.flight_id = t.flight_id
+WHERE 
+    YEAR(f.date) = 2017
+GROUP BY 
+    f.flight_id, f.date, p.capacity
+HAVING 
+    COUNT(t.ticket_id) < p.capacity * 0.25;
+--(9)
 
 
 --(10) What are the three employees that have sold the most tickets in 2017?
@@ -136,6 +169,31 @@ GROUP BY
     pt.name
 ORDER BY 
     COUNT(t.ticket_id) DESC;
+--15
+SELECT TOP 1
+	purchase_date AS date_with_most_revenue,
+       SUM(final_price) AS total_revenue
+FROM 
+	tickets
+WHERE 
+	YEAR(purchase_date) = 2017
+GROUP BY 
+	purchase_date
+ORDER BY 
+	total_revenue DESC;
+--16
+SELECT TOP 1
+	HOUR(purchase_time) AS hour_of_day,
+       COUNT(*) AS num_tickets_sold
+FROM 
+	tickets
+WHERE 
+	YEAR(purchase_date) = 2017
+GROUP BY 
+	HOUR(purchase_time)
+ORDER BY 
+	num_tickets_sold DESC;
+
 --(17)
 SELECT TOP 3
     cs.name AS city,
