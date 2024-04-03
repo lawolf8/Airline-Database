@@ -53,13 +53,13 @@ where ti.customer_id in
 (select customer_id from customers where
 datediff(year,birth_date,purchase_date)between 16 and 23);
 	
-	
-
 --Query 5 (Unsure what would be registered/non-registered)
-SELECT
-FROM(
-    SELECT C.
-) AS Query_5;
+SELECT YEAR(T.purchase_date) As Year, MONTH(T.purchase_date) AS Month, SUM(CASE WHEN C.customer_id IS NOT NULL THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN C.customer_id IS NULL THEN 1 ELSE 0 END) AS RegisteredRatio
+FROM Tickets T
+LEFT JOIN cUSTOMERS c ON T.customer_id=C.customer_id
+WHERE YEAR (T.purchase_date) IN (2016, 2017)
+GROUP BY YEAR(T.purchase_date), MONTH(T.purchase_date)
+ORDER BY YEAR(T.purchase_date), MONTH(T.purchase_date);
 
 --Query 6
 SELECT W.weekday AS DayOfWeek, R.route_id, COUNT(T.ticket_id) AS TicketsSold
@@ -89,7 +89,7 @@ WHERE r.city_state_id_origin = (SELECT city_state_id FROM cities_states WHERE na
 GROUP BY r.route_id, w.name, HOUR(t.purchase_time)
 ORDER BY r.route_id, w.name, num_tickets_sold DESC;
 
---(8)
+--Query 8
 SELECT 
     f.flight_id,
     f.date AS departure_date,
@@ -109,7 +109,7 @@ GROUP BY
 HAVING 
     COUNT(t.ticket_id) < p.capacity * 0.25;
 	
---(9)
+--Query 9
   SELECT 
 	month(purchase_date) AS month
 	count(*) AS tickets_sold
@@ -126,7 +126,7 @@ WHERE tickets_sold IN (
   SELECT MAX(tickets_sold) AS max_sales FROM monthly_sales
 );
 
---(10) What are the three employees that have sold the most tickets in 2017?
+--Query 10 What are the three employees that have sold the most tickets in 2017?
 SELECT TOP 3
     e.employee_id,
     e.first_name,
@@ -143,8 +143,7 @@ GROUP BY
 ORDER BY 
     COUNT(t.ticket_id) DESC;
 
-
--- (11) What was the most demanded cabin type for tickets sold in 2017?
+--Query 11 What was the most demanded cabin type for tickets sold in 2017?
 SELECT TOP 1
     ct.name AS cabin_type,
     COUNT(t.ticket_id) AS num_tickets_sold
@@ -159,9 +158,7 @@ GROUP BY
 ORDER BY 
     COUNT(t.ticket_id) DESC;
 
-
-
---(12) What is the purchase location in which most tickets were sold in 2016?
+--Query 12 What is the purchase location in which most tickets were sold in 2016?
 SELECT TOP 1
     loc.name AS purchase_location,
     COUNT(t.ticket_id) AS num_tickets_sold
@@ -176,10 +173,7 @@ GROUP BY
 ORDER BY 
     COUNT(t.ticket_id) DESC;
 
-
-
-
---(Query 13)
+--Query 13
  SELECT f.flight_id,
        p.capacity AS plane_capacity,
        COUNT(t.ticket_id) AS sold_tickets
@@ -189,7 +183,7 @@ LEFT JOIN tickets t ON f.flight_id = t.flight_id
 GROUP BY f.flight_id, p.capacity
 HAVING COUNT(t.ticket_id) = p.capacity;
 
---14 What was the most used payment type for tickets sold in 2017?
+--Query 14 What was the most used payment type for tickets sold in 2017?
 SELECT TOP 1
     pt.name AS payment_type,
     COUNT(t.ticket_id) AS num_tickets_sold
@@ -203,7 +197,8 @@ GROUP BY
     pt.name
 ORDER BY 
     COUNT(t.ticket_id) DESC;
---15
+
+--Query 15
 SELECT TOP 1
 	purchase_date AS date_with_most_revenue,
        SUM(final_price) AS total_revenue
@@ -228,7 +223,7 @@ GROUP BY
 ORDER BY 
 	num_tickets_sold DESC;
 
---(17)
+--Query 17
 SELECT TOP 3
     cs.name AS city,
 	
@@ -242,7 +237,7 @@ GROUP BY
 ORDER BY 
     COUNT(c.customer_id) DESC;
 
---(18) What are the six zip codes where most employees live in?
+--Query 18 What are the six zip codes where most employees live in?
 SELECT TOP 6
     e.zipcode_id,
     z.name AS zipcode,
@@ -256,7 +251,7 @@ GROUP BY
 ORDER BY 
     COUNT(e.employee_id) DESC;
 
---(19) What three customers bought the most tickets in 2017?
+--Query 19 What three customers bought the most tickets in 2017?
 SELECT TOP 3
     c.customer_id,
     c.first_name,
