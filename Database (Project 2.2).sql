@@ -20,8 +20,7 @@ FROM (
     WHERE F.date BETWEEN '2017-01-01' AND '2017-12-31'
     GROUP BY F.flight_id, P.capacity
     HAVING (P.capacity * 0.25) > COUNT(T.ticket_id)
-) AS SubQuery_2
-GROUP BY SubQuery_3.route_id;
+) AS SubQuery_2;
 
 --Query 3
 SELECT R.route_id, MAX(finalprices) AS MaxTotalRevenue, MIN(finalprices) AS MinTotalRevenue
@@ -32,7 +31,8 @@ FROM (
     JOIN routes R ON F.route_id = R.route_id
     WHERE F.date BETWEEN '2017-01-01' AND '2017-12-31'
     GROUP BY R.route_id
-) AS SubQuery_3;
+) AS SubQuery_3
+GROUP BY SubQuery_3.route_id;
 
 --Query 4
 --4.1
