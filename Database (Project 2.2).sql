@@ -276,13 +276,22 @@ ORDER BY
     COUNT(t.ticket_id) DESC;
 
 --Query 20
-SELECT R.route_ID, MAX(ticketcount) AS MostUsedRouteOnWeekends
+SELECT 
+    Sub.Route_ID, 
+    MAX(Sub.TicketCount) AS MostUsedRouteOnWeekends
 FROM (
-    SELECT COUNT(T.ticket_id) AS ticketcount
-    FROM Tickets T
-    JOIN flights F ON T.flight_id = F.flight_id
-    JOIN routes R ON F.route_id = R.route_id
-    JOIN weekdays W ON R.weekday_id=W.weekday_id
-    WHERE W.weekday_ID IN (6,7) AND F.date BETWEEN '2017-01-01' AND '2017-12-31'
-    GROUP BY R.route_id
-) AS Query_20;
+    SELECT 
+        R.route_id, 
+        COUNT(T.ticket_id) AS TicketCount
+    FROM 
+        Tickets T
+        JOIN flights F ON T.flight_id = F.flight_id
+        JOIN routes R ON F.route_id = R.route_id
+    WHERE 
+        DATEPART(weekday, F.date) IN (7, 1) -- Assuming 7 is Saturday and 1 is Sunday
+        AND F.date BETWEEN '2017-01-01' AND '2017-12-31'
+    GROUP BY 
+        R.route_id
+) AS Sub
+GROUP BY 
+    Sub.Route_ID;
