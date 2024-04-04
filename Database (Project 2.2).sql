@@ -36,23 +36,27 @@ GROUP BY SubQuery_3.route_id;
 
 --Query 4
 --4.1
-select count(*) 'Elderly Discount', sum(total_discount) total_discount
+select count(*) 'Elderly Discount', sum(total_discount) AS total_discount
 from
 (select (final_price*( select percentage from discounts
-where name='Elderly Discount')) total_discount
+where name='Elderly Discount')) AS total_discount
 from tickets ti
 where ti.customer_id in
 (select customer_id from customers where
 datediff(year,birth_date,purchase_date)>=65;
 --4.2
-select count(*) 'Student Discount', sum(total_discount) total_discount
-from
-(select (final_price*( select percentage from discounts
-where name='Student Discount')) total_discount
-from tickets ti
-where ti.customer_id in
-(select customer_id from customers where
-datediff(year,birth_date,purchase_date)between 16 and 23);
+SELECT COUNT(*) AS [Student Discount], 
+       SUM(total_discount) AS total_discount
+FROM (
+    SELECT (ti.final_price * (
+        SELECT percentage / 100.0 FROM discounts WHERE name='Student Discount'
+    )) AS total_discount
+    FROM tickets ti
+    WHERE ti.customer_id IN (
+        SELECT customer_id FROM customers 
+        WHERE DATEDIFF(year, birth_date, getdate()) BETWEEN 16 AND 23
+    )
+) AS StudentDiscountSubquery;
 	
 --Query 5 (Unsure what would be registered/non-registered)
 SELECT YEAR(T.purchase_date) As Year, MONTH(T.purchase_date) AS Month, SUM(CASE WHEN C.customer_id IS NOT NULL THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN C.customer_id IS NULL THEN 1 ELSE 0 END) AS RegisteredRatio
