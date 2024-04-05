@@ -59,7 +59,8 @@ where name='Elderly Discount')) AS total_discount
 from tickets ti
 where ti.customer_id in
 (select customer_id from customers where
-datediff(year,birth_date,purchase_date)>=65;
+datediff(year,birth_date,purchase_date)>=65);
+
 --4.2
 SELECT COUNT(*) AS [Student Discount], 
        SUM(total_discount) AS total_discount
