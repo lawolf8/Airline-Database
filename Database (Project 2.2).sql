@@ -105,6 +105,7 @@ GROUP BY
 ORDER BY 
     W.weekday, TicketsSold DESC;
 
+
 --Query 7
 SELECT r.route_id,
        w.name AS weekday,
