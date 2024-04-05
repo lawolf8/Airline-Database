@@ -23,16 +23,32 @@ FROM (
 ) AS SubQuery_2;
 
 --Query 3
-SELECT R.route_id, MAX(finalprices) AS MaxTotalRevenue, MIN(finalprices) AS MinTotalRevenue
-FROM (
-    SELECT R.route_id, SUM(T.final_price) AS finalprices
-    FROM Tickets T
-    JOIN flights F ON T.flight_id = F.flight_id
-    JOIN routes R ON F.route_id = R.route_id
-    WHERE F.date BETWEEN '2017-01-01' AND '2017-12-31'
-    GROUP BY R.route_id
-) AS SubQuery_3
-GROUP BY SubQuery_3.route_id;
+WITH RouteRevenues AS (
+    SELECT 
+        R.route_id, 
+        SUM(T.final_price) AS TotalRevenue
+    FROM 
+        Tickets T
+        JOIN flights F ON T.flight_id = F.flight_id
+        JOIN routes R ON F.route_id = R.route_id
+    WHERE 
+        F.date BETWEEN '2017-01-01' AND '2017-12-31'
+    GROUP BY 
+        R.route_id
+)
+SELECT
+    'Max Revenue Route' AS Revenue_Value_Description,
+    route_id,
+    TotalRevenue
+FROM RouteRevenues
+WHERE TotalRevenue = (SELECT MAX(TotalRevenue) FROM RouteRevenues)
+UNION ALL
+SELECT
+    'Min Revenue Route' AS Revenue_Value_Description,
+    route_id,
+    TotalRevenue
+FROM RouteRevenues
+WHERE TotalRevenue = (SELECT MIN(TotalRevenue) FROM RouteRevenues);
 
 --Query 4
 --4.1
