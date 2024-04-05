@@ -135,7 +135,7 @@ SELECT
     DepartureHour,
     TicketsSold
 FROM 
-    HourlyTicketSales
+    DOWHourlyTicketSales
 WHERE 
     Rank = 1
 ORDER BY 
