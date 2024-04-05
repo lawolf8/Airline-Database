@@ -160,7 +160,7 @@ WHERE tickets_sold IN (
   SELECT MAX(tickets_sold) FROM monthly_sales
 );
 
---Query 10 What are the three employees that have sold the most tickets in 2017?
+--Query 10
 SELECT TOP 3
     e.employee_id,
     e.first_name,
@@ -177,7 +177,7 @@ GROUP BY
 ORDER BY 
     COUNT(t.ticket_id) DESC;
 
---Query 11 What was the most demanded cabin type for tickets sold in 2017?
+--Query 11
 SELECT TOP 1
     ct.name AS cabin_type,
     COUNT(t.ticket_id) AS num_tickets_sold
@@ -192,7 +192,7 @@ GROUP BY
 ORDER BY 
     COUNT(t.ticket_id) DESC;
 
---Query 12 What is the purchase location in which most tickets were sold in 2016?
+--Query 12
 SELECT TOP 1
     loc.name AS purchase_location,
     COUNT(t.ticket_id) AS num_tickets_sold
@@ -217,7 +217,7 @@ LEFT JOIN tickets t ON f.flight_id = t.flight_id
 GROUP BY f.flight_id, p.capacity
 HAVING COUNT(t.ticket_id) = p.capacity;
 
---Query 14 What was the most used payment type for tickets sold in 2017?
+--Query 14
 SELECT TOP 1
     pt.name AS payment_type,
     COUNT(t.ticket_id) AS num_tickets_sold
@@ -271,7 +271,7 @@ GROUP BY
 ORDER BY 
     COUNT(c.customer_id) DESC;
 
---Query 18 What are the six zip codes where most employees live in?
+--Query 18
 SELECT TOP 6
     e.zipcode_id,
     z.name AS zipcode,
@@ -285,7 +285,7 @@ GROUP BY
 ORDER BY 
     COUNT(e.employee_id) DESC;
 
---Query 19 What three customers bought the most tickets in 2017?
+--Query 19
 SELECT TOP 3
     c.customer_id,
     c.first_name,
@@ -317,7 +317,7 @@ FROM (
         JOIN flights F ON T.flight_id = F.flight_id
         JOIN routes R ON F.route_id = R.route_id
     WHERE 
-        DATEPART(weekday, F.date) IN (7, 1) -- Assuming 7 is Saturday and 1 is Sunday
+        DATEPART(weekday, F.date) IN (7, 1)
         AND F.date BETWEEN '2017-01-01' AND '2017-12-31'
     GROUP BY 
         R.route_id
