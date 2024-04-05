@@ -75,7 +75,7 @@ FROM (
     )
 ) AS StudentDiscountSubquery;
 	
---Query 5 (Unsure what would be registered/non-registered)
+--Query 5
 SELECT YEAR(T.purchase_date) As Year, MONTH(T.purchase_date) AS Month, SUM(CASE WHEN C.customer_id IS NOT NULL THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN C.customer_id IS NULL THEN 1 ELSE 0 END) AS RegisteredRatio
 FROM Tickets T
 LEFT JOIN Customers C ON T.customer_id=C.customer_id
@@ -126,7 +126,6 @@ WITH DOWHourlyTicketSales AS (
         DATEPART(dw, F.date),
         DATEPART(hour, F.start_time_actual)
 )
-
 SELECT 
     Weekday,
     DepartureHour,
@@ -138,7 +137,6 @@ WHERE
 ORDER BY 
     Weekday;
 
-	
 --Query 9
 WITH monthly_sales AS (
   SELECT 
