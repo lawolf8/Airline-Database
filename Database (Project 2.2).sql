@@ -17,7 +17,7 @@ FROM (
     FROM flights F
     JOIN planes P ON F.plane_id = P.plane_id
     JOIN tickets T ON T.flight_id = F.flight_id
-    WHERE F.date BETWEEN '2017-01-01' AND '2017-12-31'
+    WHERE YEAR(F.date) = 2017
     GROUP BY F.flight_id, P.capacity
     HAVING (P.capacity * 0.25) > COUNT(T.ticket_id)
 ) AS SubQuery_2;
