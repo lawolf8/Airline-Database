@@ -61,7 +61,7 @@ FROM (
 --Query 5 (Unsure what would be registered/non-registered)
 SELECT YEAR(T.purchase_date) As Year, MONTH(T.purchase_date) AS Month, SUM(CASE WHEN C.customer_id IS NOT NULL THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN C.customer_id IS NULL THEN 1 ELSE 0 END) AS RegisteredRatio
 FROM Tickets T
-LEFT JOIN cUSTOMERS c ON T.customer_id=C.customer_id
+LEFT JOIN Customers C ON T.customer_id=C.customer_id
 WHERE YEAR (T.purchase_date) IN (2016, 2017)
 GROUP BY YEAR(T.purchase_date), MONTH(T.purchase_date)
 ORDER BY YEAR(T.purchase_date), MONTH(T.purchase_date);
