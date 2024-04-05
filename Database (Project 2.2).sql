@@ -109,15 +109,15 @@ ORDER BY
 --Query 7
 SELECT r.route_id,
        w.name AS weekday,
-       HOUR(t.purchase_time) AS hour_of_day,
+       DATEPART(HOUR, t.purchase_time) AS hour_of_day,
        COUNT(*) AS num_tickets_sold
 FROM tickets t
 JOIN flights f ON t.flight_id = f.flight_id
 JOIN routes r ON f.route_id = r.route_id
 JOIN weekdays w ON r.weekday_id = w.weekday_id
-WHERE r.city_state_id_origin = (SELECT city_state_id FROM cities_states WHERE name = 'Orlando')
-  AND r.city_state_id_destination = (SELECT city_state_id FROM cities_states WHERE name = 'Tampa')
-GROUP BY r.route_id, w.name, HOUR(t.purchase_time)
+WHERE r.city_state_id_origin = (SELECT TOP 1 city_state_id FROM cities_states WHERE name = 'Orlando')
+  AND r.city_state_id_destination = (SELECT TOP 1 city_state_id FROM cities_states WHERE name = 'Tampa')
+GROUP BY r.route_id, w.name, DATEPART(HOUR, t.purchase_time)
 ORDER BY r.route_id, w.name, num_tickets_sold DESC;
 
 --Query 8
