@@ -244,23 +244,23 @@ GROUP BY
 	purchase_date
 ORDER BY 
 	total_revenue DESC;
---16
+
+--Query 16
 SELECT TOP 1
-	HOUR(purchase_time) AS hour_of_day,
-       COUNT(*) AS num_tickets_sold
+	DATEPART(HOUR,purchase_time) AS hour_of_day,
+    COUNT(*) AS num_tickets_sold
 FROM 
 	tickets
 WHERE 
 	YEAR(purchase_date) = 2017
 GROUP BY 
-	HOUR(purchase_time)
+	DATEPART(HOUR,purchase_time)
 ORDER BY 
 	num_tickets_sold DESC;
 
 --Query 17
 SELECT TOP 3
     cs.name AS city,
-	
     COUNT(c.customer_id) AS num_customers
 FROM 
     customers c
