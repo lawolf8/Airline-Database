@@ -107,11 +107,11 @@ FROM (
             tickets T 
             JOIN flights F ON T.flight_id = F.flight_id
             JOIN routes R ON F.route_id = R.route_id
-            JOIN cities_states cs_origin ON R.city_state_id_origin = cs_origin.city_state_id
-            JOIN cities_states cs_destination ON R.city_state_id_destination = cs_destination.city_state_id
+            JOIN cities_states CS1 ON R.city_state_id_origin = CS1.city_state_id
+            JOIN cities_states CS2 ON R.city_state_id_destination = CS2.city_state_id
         WHERE 
-            cs_origin.name = 'Tampa' 
-            AND cs_destination.name = 'Orlando'
+            CS1.name = 'Tampa' 
+            AND CS2.name = 'Orlando'
         GROUP BY 
             F.route_id, DATEPART(WEEKDAY, T.purchase_date)
     ) AS weekday_tickets_sold
