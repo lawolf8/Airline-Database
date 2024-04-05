@@ -67,18 +67,26 @@ GROUP BY YEAR(T.purchase_date), MONTH(T.purchase_date)
 ORDER BY YEAR(T.purchase_date), MONTH(T.purchase_date);
 
 --Query 6
-SELECT W.weekday AS DayOfWeek, R.route_id, COUNT(T.ticket_id) AS TicketsSold
-FROM (
-    SELECT *
-    FROM Tickets T
-    JOIN flights F ON T.flight_id = F.flight_id
-    JOIN routes R ON F.route_id = R.route_id
-    JOIN weekdays W ON R.weekday_id = W.weekday_id
-    WHERE R.city_state_id_origin = (SELECT city_state_id FROM cities_states WHERE name = 'Tampa')
-    AND R.city_state_id_destination = (SELECT city_state_id FROM cities_states WHERE name = 'Orlando')
-    GROUP BY W.weekday, R.route_id
-    ORDER BY W.weekday, TicketsSold DESC
-) AS Query_6;
+SELECT 
+    W.weekday AS DayOfWeek, 
+    R.route_id, 
+    COUNT(T.ticket_id) AS TicketsSold
+FROM 
+    Tickets T
+JOIN 
+    flights F ON T.flight_id = F.flight_id
+JOIN 
+    routes R ON F.route_id = R.route_id
+JOIN 
+    weekdays W ON R.weekday_id = W.weekday_id
+WHERE 
+    R.city_state_id_origin = (SELECT city_state_id FROM cities_states WHERE name = 'Tampa')
+    AND 
+    R.city_state_id_destination = (SELECT city_state_id FROM cities_states WHERE name = 'Orlando')
+GROUP BY 
+    W.weekday, R.route_id
+ORDER BY 
+    W.weekday, TicketsSold DESC;
 
 --Query 7
 SELECT r.route_id,
