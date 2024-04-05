@@ -139,20 +139,23 @@ HAVING
     COUNT(t.ticket_id) < p.capacity * 0.25;
 	
 --Query 9
+WITH monthly_sales AS (
   SELECT 
-	month(purchase_date) AS month
-	count(*) AS tickets_sold
+    MONTH(purchase_date) AS month,
+    COUNT(*) AS tickets_sold
   FROM 
-	tickets t
-  WHERE YEAR(purchase_date) = 2017
-  GROUP BY month(purchase_date)
+    tickets
+  WHERE 
+    YEAR(purchase_date) = 2017
+  GROUP BY 
+    MONTH(purchase_date)
 )
 SELECT *
 FROM monthly_sales
 WHERE tickets_sold IN (
-  SELECT MIN(tickets_sold) AS min_sales FROM monthly_sales
+  SELECT MIN(tickets_sold) FROM monthly_sales
   UNION ALL
-  SELECT MAX(tickets_sold) AS max_sales FROM monthly_sales
+  SELECT MAX(tickets_sold) FROM monthly_sales
 );
 
 --Query 10 What are the three employees that have sold the most tickets in 2017?
