@@ -52,15 +52,6 @@ WHERE TotalRevenue = (SELECT MIN(TotalRevenue) FROM RouteRevenues);
 
 --Query 4
 --4.1
-select count(*) 'Elderly Discount', sum(total_discount) AS total_discount
-from
-(select (final_price*( select percentage from discounts
-where name='Elderly Discount')) AS total_discount
-from tickets ti
-where ti.customer_id in
-(select customer_id from customers where
-datediff(year,birth_date,purchase_date)>=65);
-
 SELECT 
     COUNT(*) AS [Elderly Discount], 
     SUM(total_discount) AS total_discount
