@@ -32,7 +32,7 @@ WITH RouteRevenues AS (
         JOIN flights F ON T.flight_id = F.flight_id
         JOIN routes R ON F.route_id = R.route_id
     WHERE 
-        F.date BETWEEN '2017-01-01' AND '2017-12-31'
+        year(F.date) = 2017
     GROUP BY 
         R.route_id
 )
