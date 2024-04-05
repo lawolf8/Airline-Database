@@ -87,43 +87,37 @@ WHERE YEAR (T.purchase_date) IN (2016, 2017)
 GROUP BY YEAR(T.purchase_date), MONTH(T.purchase_date)
 ORDER BY YEAR(T.purchase_date), MONTH(T.purchase_date);
 
---new Query 6
-SELECT
-    w.route_id,
-    w.weekday,
-    w.num_tickets_sold
+--Query 6
+SELECT 
+    W.route_id, 
+    W.weekday, 
+    W.tickets_sold 
 FROM (
-    SELECT
-        route_id,
-        weekday,
-        num_tickets_sold,
-        ROW_NUMBER() OVER (PARTITION BY weekday ORDER BY num_tickets_sold DESC) AS ranking
+    SELECT 
+        route_id, 
+        weekday, 
+        tickets_sold, 
+        ROW_NUMBER() OVER (PARTITION BY weekday ORDER BY tickets_sold DESC) AS rank
     FROM (
-        SELECT
-            f.route_id,
-            DATEPART(WEEKDAY, t.purchase_date) AS weekday,
-            COUNT(t.ticket_id) AS num_tickets_sold
-        FROM
-            tickets t
-        JOIN
-            flights f ON t.flight_id = f.flight_id
-        JOIN
-            routes r ON f.route_id = r.route_id
-        JOIN
-            cities_states cs_origin ON r.city_state_id_origin = cs_origin.city_state_id
-        JOIN
-            cities_states cs_destination ON r.city_state_id_destination = cs_destination.city_state_id
-        WHERE
-            cs_origin.name = 'Tampa'
-            AND cs_destination.name = 'Orlando'
-        GROUP BY
-            f.route_id, DATEPART(WEEKDAY, t.purchase_date)
+        SELECT 
+            F.route_id, 
+            DATEPART(WEEKDAY, T.purchase_date) AS weekday, 
+            COUNT(T.ticket_id) AS tickets_sold
+        FROM 
+            tickets T 
+            JOIN flights F ON T.flight_id = F.flight_id
+            JOIN routes R ON F.route_id = R.route_id
+            JOIN cities_states CS1 ON R.city_state_id_origin = CS1.city_state_id
+            JOIN cities_states CS2 ON R.city_state_id_destination = CS2.city_state_id
+        WHERE 
+            CS1.name = 'Tampa' 
+            AND CS2.name = 'Orlando'
+        GROUP BY 
+            F.route_id, DATEPART(WEEKDAY, T.purchase_date)
     ) AS weekday_tickets_sold
-) AS w
-WHERE
-    w.ranking = 1
-ORDER BY
-    w.weekday;
+) AS W 
+WHERE 
+    W.rank = 1;
 
 --Query 7
 WITH DOWHourlyTicketSales AS (
