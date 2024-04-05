@@ -107,50 +107,37 @@ ORDER BY
 
 
 --Query 7
+WITH DOWHourlyTicketSales AS (
+    SELECT
+        DATEPART(dw, F.date) AS Weekday,
+        DATEPART(hour, F.start_time_actual) AS DepartureHour,
+        COUNT(T.ticket_id) AS TicketsSold,
+        ROW_NUMBER() OVER (PARTITION BY DATEPART(dw, F.date) ORDER BY COUNT(T.ticket_id) DESC) AS Rank
+    FROM
+        Tickets T
+        JOIN Flights F ON T.flight_id = F.flight_id
+        JOIN Routes R ON F.route_id = R.route_id
+        JOIN cities_states CS1 ON R.city_state_id_origin = CS1.city_state_id
+        JOIN cities_states CS2 ON R.city_state_id_destination = CS2.city_state_id
+    WHERE
+        CS1.name = 'Orlando' AND CS2.name = 'Tampa'
+        AND YEAR(F.date) = 2017
+    GROUP BY
+        DATEPART(dw, F.date),
+        DATEPART(hour, F.start_time_actual)
+)
+
 SELECT 
-    r.route_id,
-    w.name AS weekday,
-    DATEPART(HOUR, t.purchase_time) AS hour_of_day,
-    COUNT(*) AS num_tickets_sold
+    Weekday,
+    DepartureHour,
+    TicketsSold
 FROM 
-    tickets t
-JOIN 
-    flights f ON t.flight_id = f.flight_id
-JOIN 
-    routes r ON f.route_id = r.route_id
-JOIN 
-    weekdays w ON r.weekday_id = w.weekday_id
-JOIN 
-    cities_states origin ON r.city_state_id_origin = origin.city_state_id
-JOIN 
-    cities_states destination ON r.city_state_id_destination = destination.city_state_id
+    HourlyTicketSales
 WHERE 
-    origin.name = 'Orlando'
-AND 
-    destination.name = 'Tampa'
-GROUP BY 
-    r.route_id, w.name, DATEPART(HOUR, t.purchase_time)
+    Rank = 1
 ORDER BY 
-    r.route_id, w.name, num_tickets_sold DESC;
---Query 8
-SELECT 
-    f.flight_id,
-    f.date AS departure_date,
-    COUNT(t.ticket_id) AS num_tickets_sold,
-    p.capacity AS plane_capacity,
-    p.capacity * 0.25 AS min_required_tickets
-FROM 
-    flights f
-JOIN 
-    planes p ON f.plane_id = p.plane_id
-LEFT JOIN 
-    tickets t ON f.flight_id = t.flight_id
-WHERE 
-    YEAR(f.date) = 2017
-GROUP BY 
-    f.flight_id, f.date, p.capacity
-HAVING 
-    COUNT(t.ticket_id) < p.capacity * 0.25;
+    Weekday;
+
 	
 --Query 9
 WITH monthly_sales AS (
