@@ -282,7 +282,6 @@ SELECT TOP 1
 FROM (
     SELECT 
         R.route_id,
-        R. 
         COUNT(T.ticket_id) AS TicketCount
     FROM 
         Tickets T
