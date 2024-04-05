@@ -89,26 +89,35 @@ ORDER BY YEAR(T.purchase_date), MONTH(T.purchase_date);
 
 --Query 6
 SELECT 
-    W.weekday AS DayOfWeek, 
-    R.route_id, 
-    COUNT(T.ticket_id) AS TicketsSold
-FROM 
-    Tickets T
-JOIN 
-    flights F ON T.flight_id = F.flight_id
-JOIN 
-    routes R ON F.route_id = R.route_id
-JOIN 
-    weekdays W ON R.weekday_id = W.weekday_id
+    W.route_id, 
+    W.weekday, 
+    W.tickets_sold 
+FROM (
+    SELECT 
+        route_id, 
+        weekday, 
+        tickets_sold, 
+        ROW_NUMBER() OVER (PARTITION BY weekday ORDER BY tickets_sold DESC) AS rank
+    FROM (
+        SELECT 
+            F.route_id, 
+            DATEPART(WEEKDAY, T.purchase_date) AS weekday, 
+            COUNT(T.ticket_id) AS tickets_sold
+        FROM 
+            tickets T 
+            JOIN flights F ON T.flight_id = F.flight_id
+            JOIN routes R ON F.route_id = R.route_id
+            JOIN cities_states cs_origin ON R.city_state_id_origin = cs_origin.city_state_id
+            JOIN cities_states cs_destination ON R.city_state_id_destination = cs_destination.city_state_id
+        WHERE 
+            cs_origin.name = 'Tampa' 
+            AND cs_destination.name = 'Orlando'
+        GROUP BY 
+            F.route_id, DATEPART(WEEKDAY, T.purchase_date)
+    ) AS weekday_tickets_sold
+) AS W 
 WHERE 
-    R.city_state_id_origin = (SELECT city_state_id FROM cities_states WHERE name = 'Tampa')
-    AND 
-    R.city_state_id_destination = (SELECT city_state_id FROM cities_states WHERE name = 'Orlando')
-GROUP BY 
-    W.weekday, R.route_id
-ORDER BY 
-    W.weekday, TicketsSold DESC;
-
+    W.rank = 1;
 
 --Query 7
 WITH DOWHourlyTicketSales AS (
