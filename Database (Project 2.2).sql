@@ -150,6 +150,26 @@ WHERE
 ORDER BY 
     Weekday;
 
+--Query 8
+SELECT 
+    f.flight_id,
+    f.date AS departure_date,
+    COUNT(t.ticket_id) AS num_tickets_sold,
+    p.capacity AS plane_capacity,
+    p.capacity * 0.25 AS min_required_tickets
+FROM 
+    flights f
+JOIN 
+    planes p ON f.plane_id = p.plane_id
+LEFT JOIN 
+    tickets t ON f.flight_id = t.flight_id
+WHERE 
+    YEAR(f.date) = 2017
+GROUP BY 
+    f.flight_id, f.date, p.capacity
+HAVING 
+    COUNT(t.ticket_id) < p.capacity * 0.25;
+
 --Query 9
 WITH monthly_sales AS (
   SELECT 
