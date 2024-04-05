@@ -276,12 +276,13 @@ ORDER BY
     COUNT(t.ticket_id) DESC;
 
 --Query 20
-SELECT 
+SELECT TOP 1
     Sub.Route_ID, 
     MAX(Sub.TicketCount) AS MostUsedRouteOnWeekends
 FROM (
     SELECT 
-        R.route_id, 
+        R.route_id,
+        R. 
         COUNT(T.ticket_id) AS TicketCount
     FROM 
         Tickets T
@@ -294,4 +295,6 @@ FROM (
         R.route_id
 ) AS Sub
 GROUP BY 
-    Sub.Route_ID;
+    Sub.Route_ID
+ORDER BY 
+    MostUsedRouteOnWeekends DESC;
