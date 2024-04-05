@@ -61,6 +61,19 @@ where ti.customer_id in
 (select customer_id from customers where
 datediff(year,birth_date,purchase_date)>=65);
 
+SELECT 
+    COUNT(*) AS [Elderly Discount], 
+    SUM(total_discount) AS total_discount
+FROM (
+    SELECT 
+        (T.final_price * (SELECT TOP 1 D.percentage / 100.0 FROM discounts D WHERE D.name='Elderly Discount')) AS total_discount
+    FROM 
+        tickets T
+        JOIN customers C ON T.customer_id = C.customer_id
+    WHERE 
+        DATEDIFF(year, C.birth_date, T.purchase_date) >= 65
+) AS DiscountCalculations;
+
 --4.2
 SELECT COUNT(*) AS [Student Discount], 
        SUM(total_discount) AS total_discount
