@@ -1,1 +1,28 @@
-
+1)---------------------------------------------------------------
+CREATE OR ALTER TRIGGER Flights_Date_Restriction_On_Edit_Trigger
+ON flights
+AFTER INSERT, UPDATE
+AS
+BEGIN
+    -- Check if the inserted or updated date values fall outside the allowed range
+    IF EXISTS (
+        SELECT 1
+        FROM inserted
+        WHERE YEAR(date) < 2016 OR YEAR(date) > 2019
+    )
+    BEGIN
+        -- Rollback the transaction and display an error message
+        ROLLBACK TRANSACTION;
+        RAISERROR ('Flight dates must be between 2016 and 2019.', 16, 1);
+    END
+END;
+2)------------------------------------------------
+CREATE OR ALTER TRIGGER Restricted_Edit_On_Planes_Trigger
+ON planes
+INSTEAD OF INSERT, UPDATE, DELETE
+AS
+BEGIN
+    -- Show message for all operations
+    RAISERROR ('Input, modification, or deletion of rows not allowed.', 16, 1);
+END;
+3)---------------------------------------------------------------------------
