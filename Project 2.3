@@ -26,3 +26,42 @@ BEGIN
     RAISERROR ('Input, modification, or deletion of rows not allowed.', 16, 1);
 END;
 3)---------------------------------------------------------------------------
+4)---------------------------------------------------------------------------
+5)---------------------------------------------------------------------------
+6)---------------------------------------------------------------------------
+CREATE VIEW Top_100_Customers AS
+SELECT TOP 100
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    c.birth_date,
+    DATEDIFF(YEAR, c.birth_date, GETDATE()) AS current_age,
+    cs.name AS city_name
+FROM
+    customers c
+INNER JOIN
+    cities_states cs ON c.city_state_id = cs.city_state_id
+ORDER BY
+    current_age ASC,
+    c.birth_date DESC;
+7)-----------------------------------------------------------------------------
+8)-----------------------------------------------------------------------------
+CREATE VIEW Flights_By_City AS
+SELECT 
+    cs.name AS city_name,
+    COUNT(DISTINCT CASE WHEN YEAR(t.purchase_date) IN (2016, 2017) THEN f.flight_id END) AS total_flights,
+    COUNT(DISTINCT CASE WHEN YEAR(t.purchase_date) IN (2016, 2017) AND c.gender = 'Male' THEN f.flight_id END) AS male_flights,
+    COUNT(DISTINCT CASE WHEN YEAR(t.purchase_date) IN (2016, 2017) AND c.gender = 'Female' THEN f.flight_id END) AS female_flights
+FROM 
+    cities_states cs
+JOIN 
+    customers c ON cs.city_state_id = c.city_state_id
+JOIN 
+    tickets t ON c.customer_id = t.customer_id
+JOIN 
+    flights f ON t.flight_id = f.flight_id
+GROUP BY 
+    cs.name
+ORDER BY 
+    total_flights DESC
+OFFSET 0 ROWS FETCH FIRST 20 ROWS ONLY;
