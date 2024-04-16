@@ -26,6 +26,37 @@ BEGIN
     RAISERROR ('Input, modification, or deletion of rows not allowed.', 16, 1);
 END;
 3)---------------------------------------------------------------------------
+CREATE TRIGGER Restrict_Final_Price_Update
+ON tickets
+INSTEAD OF UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Check if the final_price update meets the requirement
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        JOIN tickets t ON i.ticket_id = t.ticket_id
+        JOIN flights f ON t.flight_id = f.flight_id
+        JOIN routes_cabin_types rct ON f.route_id = rct.route_id AND t.cabin_type_id = rct.cabin_type_id
+        WHERE ABS(i.final_price - rct.price) > (0.2 * rct.price)
+    )
+    BEGIN
+        -- If the requirement is not met, cancel the operation
+        RAISERROR ('Final price cannot deviate more than 20% from the corresponding route and cabin type price.', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
+    ELSE
+    BEGIN
+        -- If the requirement is met, perform the update
+        UPDATE t
+        SET t.final_price = i.final_price
+        FROM tickets t
+        INNER JOIN inserted i ON t.ticket_id = i.ticket_id;
+    END
+END;
+
 4)---------------------------------------------------------------------------
 5)---------------------------------------------------------------------------
 6)---------------------------------------------------------------------------
