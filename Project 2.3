@@ -116,6 +116,44 @@ ORDER BY
     current_age ASC,
     c.birth_date DESC;
 7)-----------------------------------------------------------------------------
+CREATE VIEW Top_3_Routes_By_Weekday AS
+SELECT 
+    route_id,
+    origin_city_name,
+    destination_city_name,
+    weekday_id,
+    weekday_name,
+    num_flights
+FROM (
+    SELECT 
+        r.route_id,
+        origin_city.name AS origin_city_name,
+        destination_city.name AS destination_city_name,
+        w.weekday_id,
+        w.name AS weekday_name,
+        COUNT(t.ticket_id) AS num_flights,
+        ROW_NUMBER() OVER (PARTITION BY w.weekday_id ORDER BY COUNT(t.ticket_id) DESC) AS route_rank
+    FROM 
+        routes r
+    JOIN 
+        cities_states origin_city ON r.city_state_id_origin = origin_city.city_state_id
+    JOIN 
+        cities_states destination_city ON r.city_state_id_destination = destination_city.city_state_id
+    JOIN 
+        weekdays w ON r.weekday_id = w.weekday_id
+    LEFT JOIN 
+        flights f ON r.route_id = f.route_id
+    LEFT JOIN 
+        tickets t ON f.flight_id = t.flight_id
+    WHERE 
+        YEAR(t.purchase_date) IN (2016, 2017)
+    GROUP BY 
+        r.route_id, origin_city.name, destination_city.name, w.weekday_id, w.name
+) AS subquery
+WHERE 
+    route_rank <= 3;
+
+
 8)-----------------------------------------------------------------------------
 CREATE VIEW Flights_By_City AS
 SELECT 
