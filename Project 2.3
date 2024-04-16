@@ -99,6 +99,108 @@ BEGIN
 END;
 
 5)---------------------------------------------------------------------------
+CREATE TRIGGER trg_planes_insert
+AFTER INSERT ON planes
+FOR EACH ROW
+BEGIN
+  INSERT INTO tb_audit (
+    aud_station,
+    aud_operation,
+    aud_date,
+    aud_time,
+    aud_username,
+    aud_table,
+    aud_identifier_id,
+    aud_column,
+    aud_before,
+    aud_after
+  )
+  VALUES (
+    @@SERVER_NAME,  -- Capture workstation name
+    'INSERT',
+    GETDATE(),     -- Capture current date
+    GETUTCDATE(),  -- Capture current time (UTC)
+    CURRENT_USER,   -- Capture username
+    'planes',
+    NEW.plane_id,   -- ID of the newly inserted row
+    NULL,           -- No column change for INSERT
+    NULL,           -- No old value for INSERT
+    CONVERT(varchar(max), NEW.*, 126)  -- Convert entire new row to string
+  );
+END;
+
+CREATE TRIGGER trg_planes_update
+AFTER UPDATE ON planes
+FOR EACH ROW
+BEGIN
+  DECLARE @old_data nvarchar(max);
+
+  -- Get the old data of the updated row
+  SELECT @old_data = CONVERT(nvarchar(max), DELETED.*, 126)
+  FROM deleted
+  WHERE deleted.plane_id = UPDATED.plane_id;
+
+  INSERT INTO tb_audit (
+    aud_station,
+    aud_operation,
+    aud_date,
+    aud_time,
+    aud_username,
+    aud_table,
+    aud_identifier_id,
+    aud_column,
+    aud_before,
+    aud_after
+  )
+  SELECT
+    @@SERVER_NAME,
+    'UPDATE',
+    GETDATE(),
+    GETUTCDATE(),
+    CURRENT_USER,
+    'planes',
+    UPDATED.plane_id,
+    d.name AS aud_column,  -- Capture the updated column name
+    @old_data AS aud_before,
+    CONVERT(varchar(max), UPDATED.*, 126) AS aud_after
+  FROM (
+    SELECT TOP 1 *
+    FROM deleted d
+    WHERE d.plane_id = UPDATED.plane_id
+  ) d;
+END;
+
+CREATE TRIGGER trg_planes_delete
+AFTER DELETE ON planes
+FOR EACH ROW
+BEGIN
+  INSERT INTO tb_audit (
+    aud_station,
+    aud_operation,
+    aud_date,
+    aud_time,
+    aud_username,
+    aud_table,
+    aud_identifier_id,
+    aud_column,
+    aud_before,
+    aud_after
+  )
+  VALUES (
+    @@SERVER_NAME,  -- Capture workstation name
+    'DELETE',
+    GETDATE(),     -- Capture current date
+    GETUTCDATE(),  -- Capture current time (UTC)
+    CURRENT_USER,   -- Capture username
+    'planes',
+    DELETED.plane_id, -- ID of the deleted row
+    NULL,           -- No column change for DELETE
+    CONVERT(varchar(max), DELETED.*, 126) AS aud_before,  -- Entire deleted row data
+    NULL            -- No new value for DELETE
+  );
+END;
+
+
 6)---------------------------------------------------------------------------
 CREATE VIEW Top_100_Customers AS
 SELECT TOP 100
