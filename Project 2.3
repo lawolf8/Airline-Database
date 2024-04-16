@@ -58,6 +58,46 @@ BEGIN
 END;
 
 4)---------------------------------------------------------------------------
+CREATE TRIGGER Restrict_FirstName_Length
+ON customers
+INSTEAD OF INSERT, UPDATE
+AS
+BEGIN
+    -- Check the length of first_name in inserted data
+    DECLARE @MinLength INT, @MaxLength INT;
+    SELECT @MinLength = MIN(LEN(first_name)), @MaxLength = MAX(LEN(first_name)) FROM inserted;
+
+    -- Get the shortest and longest length of first_name from existing data
+    DECLARE @MinExistingLength INT, @MaxExistingLength INT;
+    SELECT @MinExistingLength = MIN(LEN(first_name)), @MaxExistingLength = MAX(LEN(first_name)) FROM customers;
+
+    -- If the length of first_name in inserted data is outside the range of existing data, cancel the operation
+    IF @MinLength < @MinExistingLength OR @MaxLength > @MaxExistingLength
+    BEGIN
+        RAISERROR ('Input or update of first_name values is restricted based on the length of existing data.', 16, 1);
+        ROLLBACK TRANSACTION;
+    END
+    ELSE
+    BEGIN
+        -- If the length is within the range, perform the insert or update
+        IF EXISTS (SELECT 1 FROM inserted)
+        BEGIN
+            -- Insert the rows into the customers table
+            INSERT INTO customers (customer_id, first_name, last_name, birth_date, start_date, email, gender, phone1, phone2, address_line1, address_line2, zipcode_id, city_state_id)
+            SELECT customer_id, first_name, last_name, birth_date, start_date, email, gender, phone1, phone2, address_line1, address_line2, zipcode_id, city_state_id
+            FROM inserted;
+        END
+        ELSE
+        BEGIN
+            -- Update the rows in the customers table
+            UPDATE c
+            SET c.first_name = i.first_name
+            FROM customers c
+            INNER JOIN inserted i ON c.customer_id = i.customer_id;
+        END
+    END
+END;
+
 5)---------------------------------------------------------------------------
 6)---------------------------------------------------------------------------
 CREATE VIEW Top_100_Customers AS
