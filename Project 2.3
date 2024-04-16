@@ -276,3 +276,32 @@ GROUP BY
 ORDER BY 
     total_flights DESC
 OFFSET 0 ROWS FETCH FIRST 20 ROWS ONLY;
+
+9)-----------------------------------------------------------------------
+CREATE VIEW vw_TopCityCustomerFlightsByAgeGroup AS
+SELECT
+  c.name,
+  SUM(CASE WHEN f.flight_year = 2016 THEN 1 ELSE 0 END) AS num_flights_2016,
+  SUM(CASE WHEN f.flight_year = 2017 THEN 1 ELSE 0 END) AS num_flights_2017,
+  COUNT(DISTINCT c.customer_id) AS num_customers_2016_2017,
+  CASE
+    WHEN c.customer_age <= 25 THEN '25 or younger'
+    WHEN c.customer_age BETWEEN 26 AND 40 THEN '26 to 40'
+    WHEN c.customer_age BETWEEN 41 AND 55 THEN '41 to 55'
+    WHEN c.customer_age BETWEEN 56 AND 70 THEN '56 to 70'
+    ELSE '71 or older'
+  END AS age_group
+FROM customers c
+INNER JOIN addresses a ON c.address_id = a.address_id
+INNER JOIN cities_states cs ON a.city_state_id = cs.city_state_id
+INNER JOIN flights f ON c.customer_id = f.customer_id
+GROUP BY c.customer_id, cs.name, c.customer_age
+HAVING COUNT(DISTINCT c.customer_id) > 0  -- Exclude rows with no flights
+ORDER BY age_group, num_customers_2016_2017 DESC, num_flights_2016 DESC, num_flights_2017 DESC
+WITH TIES;  -- Break ties by city name alphabetically
+
+;
+
+SELECT * FROM vw_TopCityCustomerFlightsByAgeGroup
+  -- Limit to top 3 cities per age group based on ranking within the view
+  WHERE ROW_NUMBER() OVER (PARTITION BY age_group ORDER BY num_customers_2016_2017 DESC, num_flights_2016 DESC, num_flights_2017 DESC) <= 3;
