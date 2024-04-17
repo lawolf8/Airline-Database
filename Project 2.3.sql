@@ -4,27 +4,47 @@ ON flights
 AFTER INSERT, UPDATE
 AS
 BEGIN
-    -- Check if the inserted or updated date values fall outside the allowed range
     IF EXISTS (
         SELECT 1
         FROM inserted
         WHERE YEAR(date) < 2016 OR YEAR(date) > 2019
     )
     BEGIN
-        -- Rollback the transaction and display an error message
-        ROLLBACK TRANSACTION;
         RAISERROR ('Flight dates must be between 2016 and 2019.', 16, 1);
+        ROLLBACK TRANSACTION;
     END
 END;
+
+/*
 --2)------------------------------------------------
 CREATE OR ALTER TRIGGER Restricted_Edit_On_Planes_Trigger
 ON planes
 INSTEAD OF INSERT, UPDATE, DELETE
 AS
 BEGIN
-    -- Show message for all operations
     RAISERROR ('Input, modification, or deletion of rows not allowed.', 16, 1);
+    ROLLBACK TRANSACTION;
 END;
+
+*/
+--CORRECTED 2:
+IF EXISTS (SELECT * FROM sys.triggers WHERE name = 'Restricted_Edit_On_Planes_Trigger')
+BEGIN
+    DROP TRIGGER Restricted_Edit_On_Planes_Trigger;
+END;
+GO  -- Ends the batch here
+-- Starts a new batch
+CREATE TRIGGER Restricted_Edit_On_Planes_Trigger
+ON planes
+INSTEAD OF INSERT, UPDATE, DELETE
+AS
+BEGIN
+    RAISERROR ('Input, modification, or deletion of rows not allowed.', 16, 1);
+    ROLLBACK; -- Ensures that the transaction is not committed
+END;
+GO  -- Ends the batch, though this is optional as it's the end of the script
+
+
 --3)---------------------------------------------------------------------------
 CREATE TRIGGER Restrict_Final_Price_Update
 ON tickets
@@ -56,9 +76,6 @@ BEGIN
         INNER JOIN inserted i ON t.ticket_id = i.ticket_id;
     END
 END;
-
---3
-CREATE OR ALTER TRIGGER 
 
 --4)---------------------------------------------------------------------------
 CREATE TRIGGER Restrict_FirstName_Length
