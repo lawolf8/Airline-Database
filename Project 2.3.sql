@@ -57,6 +57,9 @@ BEGIN
     END
 END;
 
+--3
+CREATE OR ALTER TRIGGER 
+
 --4)---------------------------------------------------------------------------
 CREATE TRIGGER Restrict_FirstName_Length
 ON customers
