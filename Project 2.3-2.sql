@@ -1,3 +1,30 @@
+--This deletes all triggers and views--
+DECLARE @sql NVARCHAR(MAX) = '';
+
+SELECT @sql += 'DROP TRIGGER ' + QUOTENAME(name) + ';' 
+FROM sys.triggers;
+
+EXEC sp_executesql @sql;
+
+DECLARE @viewName NVARCHAR(MAX)
+
+DECLARE viewCursor CURSOR FOR
+SELECT name
+FROM sys.views
+
+OPEN viewCursor
+FETCH NEXT FROM viewCursor INTO @viewName
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    EXEC('DROP VIEW ' + @viewName)
+    FETCH NEXT FROM viewCursor INTO @viewName
+END
+
+CLOSE viewCursor
+DEALLOCATE viewCursor
+-------------------------------------------------------------------
+
 --1)---------------------------------------------------------------
 CREATE OR ALTER TRIGGER Flights_Date_Restriction_On_Edit_Trigger
 ON flights
