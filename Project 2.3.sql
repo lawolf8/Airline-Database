@@ -431,3 +431,44 @@ CREATE TABLE discounts (
     description VARCHAR(255),
     status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive'))
 );
+--ERROR messages
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 36 [Batch Start Line 45]
+Incorrect syntax near the keyword 'TRIGGER'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 77 [Batch Start Line 45]
+Incorrect syntax near the keyword 'TRIGGER'.
+Msg 137, Level 15, State 2, Procedure Restrict_Final_Price_Update, Line 94 [Batch Start Line 45]
+Must declare the scalar variable "@@SERVER_NAME".
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 107 [Batch Start Line 45]
+Incorrect syntax near the keyword 'TRIGGER'.
+Msg 102, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 114 [Batch Start Line 45]
+Incorrect syntax near '*'.
+Msg 137, Level 15, State 2, Procedure Restrict_Final_Price_Update, Line 131 [Batch Start Line 45]
+Must declare the scalar variable "@@SERVER_NAME".
+Msg 102, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 145 [Batch Start Line 45]
+Incorrect syntax near 'd'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 148 [Batch Start Line 45]
+Incorrect syntax near the keyword 'TRIGGER'.
+Msg 137, Level 15, State 2, Procedure Restrict_Final_Price_Update, Line 165 [Batch Start Line 45]
+Must declare the scalar variable "@@SERVER_NAME".
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 180 [Batch Start Line 45]
+Incorrect syntax near the keyword 'VIEW'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 196 [Batch Start Line 45]
+Incorrect syntax near the keyword 'VIEW'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 235 [Batch Start Line 45]
+Incorrect syntax near the keyword 'VIEW'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 256 [Batch Start Line 45]
+Incorrect syntax near the keyword 'VIEW'.
+Msg 319, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 276 [Batch Start Line 45]
+Incorrect syntax near the keyword 'with'. If this statement is a common table expression, an xmlnamespaces clause or a change tracking context clause, the previous statement must be terminated with a semicolon.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 290 [Batch Start Line 45]
+Incorrect syntax near the keyword 'CURRENT_DATE'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 312 [Batch Start Line 45]
+Incorrect syntax near the keyword 'CURRENT_DATE'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 327 [Batch Start Line 45]
+Incorrect syntax near the keyword 'CURRENT_DATE'.
+Msg 195, Level 15, State 10, Procedure Restrict_Final_Price_Update, Line 350 [Batch Start Line 45]
+'LENGTH' is not a recognized built-in function name.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 358 [Batch Start Line 45]
+Incorrect syntax near the keyword 'CURRENT_DATE'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 384 [Batch Start Line 45]
+Incorrect syntax near the keyword 'CURRENT_DATE'.
