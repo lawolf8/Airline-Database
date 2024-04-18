@@ -46,36 +46,64 @@ GO  -- Ends the batch, though this is optional as it's the end of the script
 
 
 --3)---------------------------------------------------------------------------
-CREATE TRIGGER Restrict_Final_Price_Update
-ON tickets
-INSTEAD OF UPDATE
+CREATE TABLE tb_audit
+(
+    aud_id INT IDENTITY,
+    aud_station VARCHAR(50),
+    aud_operation VARCHAR(50),
+    aud_date DATE,
+    aud_time TIME,
+    aud_username VARCHAR(50),
+    aud_table VARCHAR(50),
+    aud_identifier_id VARCHAR(50),
+    aud_column VARCHAR(50),
+    aud_before VARCHAR(MAX),
+    aud_after VARCHAR(MAX)
+);
+
+IF OBJECT_ID('dbo.tr_employees_insert', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_employees_insert;
+IF OBJECT_ID('dbo.tr_employees_update', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_employees_update;
+IF OBJECT_ID('dbo.tr_employees_delete', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_employees_delete;
+
+CREATE TRIGGER tr_employees_insert
+ON employees
+AFTER INSERT
 AS
 BEGIN
     SET NOCOUNT ON;
+    DECLARE @date DATE = CAST(GETDATE() AS DATE);
+    DECLARE @time TIME = CAST(GETDATE() AS TIME);
 
-    -- Check if the final_price update meets the requirement
-    IF EXISTS (
-        SELECT 1
-        FROM inserted i
-        JOIN tickets t ON i.ticket_id = t.ticket_id
-        JOIN flights f ON t.flight_id = f.flight_id
-        JOIN routes_cabin_types rct ON f.route_id = rct.route_id AND t.cabin_type_id = rct.cabin_type_id
-        WHERE ABS(i.final_price - rct.price) > (0.2 * rct.price)
+    INSERT INTO tb_audit (
+        aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
     )
-    BEGIN
-        -- If the requirement is not met, cancel the operation
-        RAISERROR ('Final price cannot deviate more than 20% from the corresponding route and cabin type price.', 16, 1);
-        ROLLBACK TRANSACTION;
-    END
-    ELSE
-    BEGIN
-        -- If the requirement is met, perform the update
-        UPDATE t
-        SET t.final_price = i.final_price
-        FROM tickets t
-        INNER JOIN inserted i ON t.ticket_id = i.ticket_id;
-    END
+    SELECT 
+        HOST_NAME(), 'INSERT', @date, @time, SYSTEM_USER, 'employees', i.employee_id, COLUMN_NAME, NULL, COLUMN_VALUE
+    FROM 
+        inserted AS i
+    CROSS APPLY (
+        VALUES 
+        ('employee_id', CAST(i.employee_id AS VARCHAR(MAX))),
+        ('first_name', i.first_name),
+        ('last_name', i.last_name),
+        ('birth_date', CONVERT(VARCHAR, i.birth_date, 120)),
+        ('hire_date', CONVERT(VARCHAR, i.hire_date, 120)),
+        ('email', i.email),
+        ('gender', i.gender),
+        ('SSN', i.SSN),
+        ('phone_number', i.phone_number),
+        ('address', i.address),
+        ('zipcode', i.zipcode),
+        ('city', i.city),
+        ('state', i.state),
+        ('department', i.department),
+        ('position', i.position)
+    ) AS AuditLog (COLUMN_NAME, COLUMN_VALUE);
 END;
+
 
 --4)---------------------------------------------------------------------------
 CREATE TRIGGER Restrict_FirstName_Length
@@ -120,106 +148,10 @@ END;
 
 --5)---------------------------------------------------------------------------
 CREATE TRIGGER trg_planes_insert
-AFTER INSERT ON planes
-FOR EACH ROW
+ON planes
+AFTER INSERTAS
 BEGIN
-  INSERT INTO tb_audit (
-    aud_station,
-    aud_operation,
-    aud_date,
-    aud_time,
-    aud_username,
-    aud_table,
-    aud_identifier_id,
-    aud_column,
-    aud_before,
-    aud_after
-  )
-  VALUES (
-    @@SERVER_NAME,  -- Capture workstation name
-    'INSERT',
-    GETDATE(),     -- Capture current date
-    GETUTCDATE(),  -- Capture current time (UTC)
-    CURRENT_USER,   -- Capture username
-    'planes',
-    NEW.plane_id,   -- ID of the newly inserted row
-    NULL,           -- No column change for INSERT
-    NULL,           -- No old value for INSERT
-    CONVERT(varchar(max), NEW.*, 126)  -- Convert entire new row to string
-  );
-END;
-
-CREATE TRIGGER trg_planes_update
-AFTER UPDATE ON planes
-FOR EACH ROW
-BEGIN
-  DECLARE @old_data nvarchar(max);
-
-  -- Get the old data of the updated row
-  SELECT @old_data = CONVERT(nvarchar(max), DELETED.*, 126)
-  FROM deleted
-  WHERE deleted.plane_id = UPDATED.plane_id;
-
-  INSERT INTO tb_audit (
-    aud_station,
-    aud_operation,
-    aud_date,
-    aud_time,
-    aud_username,
-    aud_table,
-    aud_identifier_id,
-    aud_column,
-    aud_before,
-    aud_after
-  )
-  SELECT
-    @@SERVER_NAME,
-    'UPDATE',
-    GETDATE(),
-    GETUTCDATE(),
-    CURRENT_USER,
-    'planes',
-    UPDATED.plane_id,
-    d.name AS aud_column,  -- Capture the updated column name
-    @old_data AS aud_before,
-    CONVERT(varchar(max), UPDATED.*, 126) AS aud_after
-  FROM (
-    SELECT TOP 1 *
-    FROM deleted d
-    WHERE d.plane_id = UPDATED.plane_id
-  ) d;
-END;
-
-CREATE TRIGGER trg_planes_delete
-AFTER DELETE ON planes
-FOR EACH ROW
-BEGIN
-  INSERT INTO tb_audit (
-    aud_station,
-    aud_operation,
-    aud_date,
-    aud_time,
-    aud_username,
-    aud_table,
-    aud_identifier_id,
-    aud_column,
-    aud_before,
-    aud_after
-  )
-  VALUES (
-    @@SERVER_NAME,  -- Capture workstation name
-    'DELETE',
-    GETDATE(),     -- Capture current date
-    GETUTCDATE(),  -- Capture current time (UTC)
-    CURRENT_USER,   -- Capture username
-    'planes',
-    DELETED.plane_id, -- ID of the deleted row
-    NULL,           -- No column change for DELETE
-    CONVERT(varchar(max), DELETED.*, 126) AS aud_before,  -- Entire deleted row data
-    NULL            -- No new value for DELETE
-  );
-END;
-
+    DECLARE @aud_station VARCHAR(5) = HOST_NAME();
 
 --6)---------------------------------------------------------------------------
 CREATE VIEW Top_100_Customers AS
