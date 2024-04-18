@@ -143,6 +143,21 @@ BEGIN
     WHERE COLUMN_VALUE_OLD <> COLUMN_VALUE_NEW;
 END;
 
+CREATE TRIGGER tr_employees_delete
+ON employees
+AFTER DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @date DATE = CAST(GETDATE() AS DATE);
+    DECLARE @time TIME = CAST(GETDATE() AS TIME);
+
+    INSERT INTO tb_audit (
+        aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
+    )
+    SELECT 
+        HOST_NAME(), 'DELETE', @date, @time, SYSTEM_USER, 'employees', d.employee_id, COLUMN_NAME,
+
 --4)---------------------------------------------------------------------------
 CREATE TRIGGER Restrict_FirstName_Length
 ON customers
