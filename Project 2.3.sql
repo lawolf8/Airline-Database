@@ -274,12 +274,12 @@ ORDER BY
 OFFSET 0 ROWS FETCH FIRST 20 ROWS ONLY;
 
 --9)-----------------------------------------------------------------------
-CREATE VIEW vw_TopCityCustomerFlightsByAgeGroup AS
+CREATE VIEW vw_nine AS
 SELECT
   c.name,
   SUM(CASE WHEN f.flight_year = 2016 THEN 1 ELSE 0 END) AS num_flights_2016,
   SUM(CASE WHEN f.flight_year = 2017 THEN 1 ELSE 0 END) AS num_flights_2017,
-  COUNT(DISTINCT c.customer_id) AS num_customers_2016_2017,
+  COUNT(DISTINCT c.customer_id) AS num_customers,
   CASE
     WHEN c.customer_age <= 25 THEN '25 or younger'
     WHEN c.customer_age BETWEEN 26 AND 40 THEN '26 to 40'
@@ -298,7 +298,7 @@ WITH TIES;  -- Break ties by city name alphabetically
 
 ;
 
-SELECT * FROM vw_TopCityCustomerFlightsByAgeGroup
+SELECT * FROM vw_nine
   -- Limit to top 3 cities per age group based on ranking within the view
   WHERE ROW_NUMBER() OVER (PARTITION BY age_group ORDER BY num_customers_2016_2017 DESC, num_flights_2016 DESC, num_flights_2017 DESC) <= 3;
 
