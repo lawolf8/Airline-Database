@@ -1,3 +1,9 @@
+/*
+Project 2.3
+Group 8
+Luke Wolf, Kyle Petrone, Michael Brennan, Reece Sleater
+*/
+
 --This deletes all triggers and views--
 DECLARE @sql NVARCHAR(MAX) = '';
 
@@ -25,7 +31,7 @@ CLOSE viewCursor
 DEALLOCATE viewCursor
 -------------------------------------------------------------------
 
---1)---------------------------------------------------------------
+--1)----------------------------------------------------------------------------
 GO
 CREATE OR ALTER TRIGGER Flights_Date_Restriction_On_Edit_Trigger
 ON flights
@@ -44,7 +50,8 @@ BEGIN
 END;
 GO
 
---2)------------------------------------------------
+
+--2)----------------------------------------------------------------------------
 IF OBJECT_ID('Restricted_Edit_On_Planes_Trigger', 'TR') IS NOT NULL
 BEGIN
     DROP TRIGGER Restricted_Edit_On_Planes_Trigger;
@@ -61,7 +68,8 @@ BEGIN
 END;
 GO
 
---3)---------------------------------------------------------------------------
+
+--3)----------------------------------------------------------------------------
 IF OBJECT_ID('Restrict_Final_Price_Update', 'TR') IS NOT NULL
 BEGIN
     DROP TRIGGER Restrict_Final_Price_Update;
@@ -100,13 +108,15 @@ BEGIN
 END;
 GO
 
---4)---------------------------------------------------------------------------
+
+--4)----------------------------------------------------------------------------
 IF OBJECT_ID('Restrict_FirstName_Length', 'TR') IS NOT NULL
 BEGIN
     DROP TRIGGER Restrict_FirstName_Length;
 END;
 GO
---6
+
+--6)----------------------------------------------------------------------------
 CREATE TRIGGER Restrict_FirstName_Length
 ON customers
 INSTEAD OF INSERT, UPDATE
@@ -148,8 +158,8 @@ BEGIN
 END;
 GO
 
---5
-CREATE TABLE tb_audit
+--5)----------------------------------------------------------------------------
+CREATE TABLE TB_audit
 (
     aud_id INT IDENTITY,
     aud_station VARCHAR(50),
@@ -177,7 +187,7 @@ BEGIN
     DECLARE @date DATE = CAST(GETDATE() AS DATE);
     DECLARE @time TIME = CAST(GETDATE() AS TIME);
 
-    INSERT INTO tb_audit (
+    INSERT INTO TB_audit (
         aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
     )
     SELECT 
@@ -208,7 +218,7 @@ BEGIN
     DECLARE @date DATE = CAST(GETDATE() AS DATE);
     DECLARE @time TIME = CAST(GETDATE() AS TIME);
 
-    INSERT INTO tb_audit (
+    INSERT INTO TB_audit (
         aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
     )
     SELECT 
@@ -242,7 +252,7 @@ BEGIN
     DECLARE @date DATE = CAST(GETDATE() AS DATE);
     DECLARE @time TIME = CAST(GETDATE() AS TIME);
 
-    INSERT INTO tb_audit (
+    INSERT INTO TB_audit (
         aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
     )
     SELECT 
@@ -261,7 +271,7 @@ BEGIN
 END;
 GO
 
---6
+--6)----------------------------------------------------------------------------
 CREATE VIEW Top_100_Customers AS
 SELECT TOP 100
     c.customer_id,
@@ -279,7 +289,8 @@ ORDER BY
     c.birth_date DESC;
 GO
 
---7
+
+--7)----------------------------------------------------------------------------
 CREATE VIEW Top_3_Routes_By_Weekday AS
 SELECT 
     route_id,
@@ -319,7 +330,7 @@ WHERE
 
 GO
 
---8)-----------------------------------------------------------------------------
+--8)----------------------------------------------------------------------------
 CREATE VIEW Flights_By_City AS
 SELECT 
     cs.name AS city_name,
@@ -340,6 +351,8 @@ ORDER BY
     total_flights DESC
 OFFSET 0 ROWS FETCH FIRST 20 ROWS ONLY;
 GO
+
+--9)----------------------------------------------------------------------------
 
 --10)----------------------------------------------------------------------------
 CREATE TABLE employees (
