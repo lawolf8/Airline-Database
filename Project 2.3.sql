@@ -464,15 +464,11 @@ Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 256 [Bat
 Incorrect syntax near the keyword 'VIEW'.
 Msg 319, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 276 [Batch Start Line 45]
 Incorrect syntax near the keyword 'with'. If this statement is a common table expression, an xmlnamespaces clause or a change tracking context clause, the previous statement must be terminated with a semicolon.
-Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 290 [Batch Start Line 45]
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 298 [Batch Start Line 45]
 Incorrect syntax near the keyword 'CURRENT_DATE'.
-Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 312 [Batch Start Line 45]
-Incorrect syntax near the keyword 'CURRENT_DATE'.
-Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 327 [Batch Start Line 45]
-Incorrect syntax near the keyword 'CURRENT_DATE'.
-Msg 195, Level 15, State 10, Procedure Restrict_Final_Price_Update, Line 350 [Batch Start Line 45]
-'LENGTH' is not a recognized built-in function name.
-Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 358 [Batch Start Line 45]
-Incorrect syntax near the keyword 'CURRENT_DATE'.
-Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 384 [Batch Start Line 45]
-Incorrect syntax near the keyword 'CURRENT_DATE'.
+Msg 156, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 339 [Batch Start Line 45]
+Incorrect syntax near the keyword 'CONSTRAINT'.
+Msg 102, Level 15, State 1, Procedure Restrict_Final_Price_Update, Line 389 [Batch Start Line 45]
+Incorrect syntax near ')'.
+
+Completion time: 2024-04-17T20:47:34.7881805-04:00
