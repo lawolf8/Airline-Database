@@ -205,3 +205,114 @@ GROUP BY
 ORDER BY 
     total_flights DESC
 OFFSET 0 ROWS FETCH FIRST 20 ROWS ONLY;
+
+
+--10)----------------------------------------------------------------------------
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    age INT CHECK (age >= 18),
+    hire_date DATE,
+    position VARCHAR(100),
+    department VARCHAR(100),
+    salary DECIMAL(10, 2) CHECK (salary >= 0),
+    email VARCHAR(255) UNIQUE,
+    phone_number VARCHAR(20),
+    address VARCHAR(255),
+    manager_id INT UNIQUE,
+    start_date DATE,
+    end_date DATE,
+    contract_type VARCHAR(50),
+    contract_duration INT CHECK (contract_duration > 0),
+    hourly_rate DECIMAL(10, 2) CHECK (hourly_rate >= 0),
+    employment_status VARCHAR(50),
+    CONSTRAINT chk_start_date CHECK (start_date < end_date),
+    CONSTRAINT chk_manager_id CHECK (manager_id <> employee_id)
+);
+
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    age INT CHECK (age >= 18),
+    gender VARCHAR(10),
+    registration_date DATE,
+    email VARCHAR(255) UNIQUE,
+    phone_number VARCHAR(20) UNIQUE,
+    address VARCHAR(255),
+    frequent_flyer_status VARCHAR(50) DEFAULT 'Regular',
+    loyalty_points INT DEFAULT 0 CHECK (loyalty_points >= 0),
+    last_flight_date DATE,
+    preferred_seat VARCHAR(20),
+    preferred_airline VARCHAR(100),
+    CONSTRAINT chk_reg_date CHECK (registration_date <= last_flight_date)
+);
+
+CREATE TABLE tickets (
+    ticket_number INT PRIMARY KEY,
+    ticket_price DECIMAL(10, 2) DEFAULT 0 CHECK (ticket_price >= 0),
+    purchase_date DATE,
+    passenger_name VARCHAR(100),
+    passenger_age INT CHECK (passenger_age >= 0),
+    passenger_gender VARCHAR(10),
+    seat_number VARCHAR(10),
+    flight_number INT,
+    customer_id INT UNIQUE,
+    departure_date DATE,
+    luggage_weight DECIMAL(10, 2),
+    luggage_size VARCHAR(50),
+    booking_reference VARCHAR(20) UNIQUE,
+    CONSTRAINT chk_pur_date CHECK(purchase_date <= departure_date),
+    CONSTRAINT chk_luggage_weight CHECK (luggage_weight >= 0)
+);
+
+CREATE TABLE locations (
+    location_id INT UNIQUE,
+    city VARCHAR(100),
+    country VARCHAR(100),
+    airport_code VARCHAR(10) UNIQUE,
+    timezone VARCHAR(50) DEFAULT 'EST',
+    region VARCHAR(100),
+    airtraffic_controller VARCHAR(50)
+
+);
+
+CREATE TABLE planes (
+    plane_id INT PRIMARY KEY,
+    model VARCHAR(100) DEFAULT '737',
+    capacity INT CHECK (capacity > 0),
+    manufacturer VARCHAR(100),
+    purchase_date DATE,
+    status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive'))
+);
+
+CREATE TABLE flights (
+    flight_number INT PRIMARY KEY,
+    departure_time DATE,
+    arrival_time DATE,
+    route_id INT,
+    plane_id INT UNIQUE,
+    status VARCHAR(50) DEFAULT 'Scheduled' CHECK (status IN ('Scheduled', 'Cancelled', 'Completed')),
+    CONSTRAINT chk_time CHECK (departure_time <= arrival_time)
+);
+
+CREATE TABLE routes (
+    route_id INT PRIMARY KEY,
+    origin VARCHAR(100),
+    destination VARCHAR(100),
+    distance DECIMAL(10, 2) CHECK (distance > 0),
+    duration TIME,
+    fare DECIMAL(10, 2) DEFAULT 0 CHECK (fare >= 0),
+    CONSTRAINT chk_duration_not_null CHECK (duration IS NOT NULL)
+);
+
+CREATE TABLE discounts (
+    discount_code VARCHAR(20) PRIMARY KEY,
+    discount_percentage DECIMAL(5, 2) DEFAULT 0 CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
+    start_date DATE,
+    expiry_date DATE,
+    description VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive')),
+    CONSTRAINT chk_discount_time CHECK(start_date <= expiry_date)
+
+
+);
