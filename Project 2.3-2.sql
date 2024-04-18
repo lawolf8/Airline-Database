@@ -366,13 +366,18 @@ SELECT
   WHEN c.customer_age BETWEEN 56 AND 70 THEN '56 to 70'
   ELSE '71 or older'
  END AS age_group
-FROM customers c
-INNER JOIN addresses a ON c.address_id = a.address_id
-INNER JOIN cities_states cs ON a.city_state_id = cs.city_state_id
-INNER JOIN flights f ON c.customer_id = f.customer_id
-GROUP BY c.customer_id, cs.name, c.customer_age
-HAVING COUNT(DISTINCT c.customer_id) > 0 -- Exclude rows with no flights
-ORDER BY age_group, num_customers_2016_2017 DESC, num_flights_2016 DESC, num_flights_2017 DESC;
+FROM 
+    customers c
+JOIN 
+    addresses a ON c.address_id = a.address_id
+JOIN 
+    cities_states cs ON a.city_state_id = cs.city_state_id
+JOIN 
+    flights f ON c.customer_id = f.customer_id
+GROUP BY 
+    c.customer_id, cs.name, c.customer_age
+ORDER BY 
+    age_group, num_customers_2016_2017 DESC, num_flights_2016 DESC, num_flights_2017 DESC;
 Go
 --10)----------------------------------------------------------------------------
 CREATE TABLE employees (
