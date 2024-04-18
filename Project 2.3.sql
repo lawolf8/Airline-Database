@@ -45,7 +45,7 @@ END;
 GO  -- Ends the batch, though this is optional as it's the end of the script
 
 
---3)---------------------------------------------------------------------------
+--5)---------------------------------------------------------------------------
 CREATE TABLE tb_audit
 (
     aud_id INT IDENTITY,
@@ -61,15 +61,12 @@ CREATE TABLE tb_audit
     aud_after VARCHAR(MAX)
 );
 
-IF OBJECT_ID('dbo.tr_employees_insert', 'TR') IS NOT NULL
-    DROP TRIGGER dbo.tr_employees_insert;
-IF OBJECT_ID('dbo.tr_employees_update', 'TR') IS NOT NULL
-    DROP TRIGGER dbo.tr_employees_update;
-IF OBJECT_ID('dbo.tr_employees_delete', 'TR') IS NOT NULL
-    DROP TRIGGER dbo.tr_employees_delete;
+IF OBJECT_ID('dbo.tr_planes_insert', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_planes_insert;
+GO
 
-CREATE TRIGGER tr_employees_insert
-ON employees
+CREATE TRIGGER tr_planes_insert
+ON planes
 AFTER INSERT
 AS
 BEGIN
@@ -81,31 +78,26 @@ BEGIN
         aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
     )
     SELECT 
-        HOST_NAME(), 'INSERT', @date, @time, SYSTEM_USER, 'employees', i.employee_id, COLUMN_NAME, NULL, COLUMN_VALUE
+        HOST_NAME(), 'INSERT', @date, @time, SYSTEM_USER, 'planes', inserted.plane_id, COLUMN_NAME, NULL, COLUMN_VALUE
     FROM 
-        inserted AS i
+        inserted
     CROSS APPLY (
         VALUES 
-        ('employee_id', CAST(i.employee_id AS VARCHAR(MAX))),
-        ('first_name', i.first_name),
-        ('last_name', i.last_name),
-        ('birth_date', CONVERT(VARCHAR, i.birth_date, 120)),
-        ('hire_date', CONVERT(VARCHAR, i.hire_date, 120)),
-        ('email', i.email),
-        ('gender', i.gender),
-        ('SSN', i.SSN),
-        ('phone_number', i.phone_number),
-        ('address', i.address),
-        ('zipcode', i.zipcode),
-        ('city', i.city),
-        ('state', i.state),
-        ('department', i.department),
-        ('position', i.position)
+        ('plane_id', CAST(plane_id AS VARCHAR(MAX))),
+        ('fabrication_date', CONVERT(VARCHAR, fabrication_date, 120)),
+        ('first_use_date', CONVERT(VARCHAR, first_use_date, 120)),
+        ('brand', brand),
+        ('model', model),
+        ('capacity', CAST(capacity AS VARCHAR(MAX)))
     ) AS AuditLog (COLUMN_NAME, COLUMN_VALUE);
 END;
 
-CREATE TRIGGER tr_employees_update
-ON employees
+IF OBJECT_ID('dbo.tr_planes_update', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_planes_update;
+GO
+
+CREATE TRIGGER tr_planes_update
+ON planes
 AFTER UPDATE
 AS
 BEGIN
@@ -117,34 +109,29 @@ BEGIN
         aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
     )
     SELECT 
-        HOST_NAME(), 'UPDATE', @date, @time, SYSTEM_USER, 'employees', i.employee_id, COLUMN_NAME, COLUMN_VALUE_OLD, COLUMN_VALUE_NEW
+        HOST_NAME(), 'UPDATE', @date, @time, SYSTEM_USER, 'planes', inserted.plane_id, COLUMN_NAME, DELETED_VALUE, INSERTED_VALUE
     FROM 
-        inserted i
+        inserted
     JOIN 
-        deleted d ON i.employee_id = d.employee_id
+        deleted ON inserted.plane_id = deleted.plane_id
     CROSS APPLY (
         VALUES 
-        ('employee_id', CAST(d.employee_id AS VARCHAR(MAX)), CAST(i.employee_id AS VARCHAR(MAX))),
-        ('first_name', d.first_name, i.first_name),
-        ('last_name', d.last_name, i.last_name),
-        ('birth_date', CONVERT(VARCHAR, d.birth_date, 120), CONVERT(VARCHAR, i.birth_date, 120)),
-        ('hire_date', CONVERT(VARCHAR, d.hire_date, 120), CONVERT(VARCHAR, i.hire_date, 120)),
-        ('email', d.email, i.email),
-        ('gender', d.gender, i.gender),
-        ('SSN', d.SSN, i.SSN),
-        ('phone_number', d.phone_number, i.phone_number),
-        ('address', d.address, i.address),
-        ('zipcode', d.zipcode, i.zipcode),
-        ('city', d.city, i.city),
-        ('state', d.state, i.state),
-        ('department', d.department, i.department),
-        ('position', d.position, i.position)
-    ) AS AuditLog (COLUMN_NAME, COLUMN_VALUE_OLD, COLUMN_VALUE_NEW)
-    WHERE COLUMN_VALUE_OLD <> COLUMN_VALUE_NEW;
+        ('plane_id', CAST(deleted.plane_id AS VARCHAR(MAX)), CAST(inserted.plane_id AS VARCHAR(MAX))),
+        ('fabrication_date', CONVERT(VARCHAR, deleted.fabrication_date, 120), CONVERT(VARCHAR, inserted.fabrication_date, 120)),
+        ('first_use_date', CONVERT(VARCHAR, deleted.first_use_date, 120), CONVERT(VARCHAR, inserted.first_use_date, 120)),
+        ('brand', deleted.brand, inserted.brand),
+        ('model', deleted.model, inserted.model),
+        ('capacity', CAST(deleted.capacity AS VARCHAR(MAX)), CAST(inserted.capacity AS VARCHAR(MAX)))
+    ) AS AuditLog (COLUMN_NAME, DELETED_VALUE, INSERTED_VALUE)
+    WHERE DELETED_VALUE <> INSERTED_VALUE;
 END;
 
-CREATE TRIGGER tr_employees_delete
-ON employees
+IF OBJECT_ID('dbo.tr_planes_delete', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_planes_delete;
+GO
+
+CREATE TRIGGER tr_planes_delete
+ON planes
 AFTER DELETE
 AS
 BEGIN
@@ -156,8 +143,19 @@ BEGIN
         aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
     )
     SELECT 
-        HOST_NAME(), 'DELETE', @date, @time, SYSTEM_USER, 'employees', d.employee_id, COLUMN_NAME,
-
+        HOST_NAME(), 'DELETE', @date, @time, SYSTEM_USER, 'planes', deleted.plane_id, COLUMN_NAME, COLUMN_VALUE, NULL
+    FROM 
+        deleted
+    CROSS APPLY (
+        VALUES 
+        ('plane_id', CAST(plane_id AS VARCHAR(MAX))),
+        ('fabrication_date', CONVERT(VARCHAR, fabrication_date, 120)),
+        ('first_use_date', CONVERT(VARCHAR, first_use_date, 120)),
+        ('brand', brand),
+        ('model', model),
+        ('capacity', CAST(capacity AS VARCHAR(MAX)))
+    ) AS AuditLog (COLUMN_NAME, COLUMN_VALUE);
+END;
 --4)---------------------------------------------------------------------------
 CREATE TRIGGER Restrict_FirstName_Length
 ON customers
@@ -198,13 +196,6 @@ BEGIN
         END
     END
 END;
-
---5)---------------------------------------------------------------------------
-CREATE TRIGGER trg_planes_insert
-ON planes
-AFTER INSERTAS
-BEGIN
-    DECLARE @aud_station VARCHAR(5) = HOST_NAME();
 
 --6)---------------------------------------------------------------------------
 CREATE VIEW Top_100_Customers AS
@@ -325,13 +316,14 @@ CREATE TABLE employees (
     phone_number VARCHAR(20),
     address VARCHAR(255),
     manager_id INT UNIQUE,
-    start_date DATE DEFAULT CURRENT_DATE,
+    start_date DATE,
     end_date DATE,
     contract_type VARCHAR(50),
     contract_duration INT CHECK (contract_duration > 0),
     hourly_rate DECIMAL(10, 2) CHECK (hourly_rate >= 0),
     employment_status VARCHAR(50),
-    CONSTRAINT chk_manager_id CHECK (manager_id <> employee_id),
+    CONSTRAINT chk_start_date CHECK (start_date < end_date),
+    CONSTRAINT chk_manager_id CHECK (manager_id <> employee_id)
 );
 
 CREATE TABLE customers (
@@ -348,7 +340,7 @@ CREATE TABLE customers (
     last_flight_date DATE,
     preferred_seat VARCHAR(20),
     preferred_airline VARCHAR(100),
-    CONSTRAINT chk_date CHECK (registration_date <= last_flight_date)
+    CONSTRAINT chk_reg_date CHECK (registration_date <= last_flight_date)
 );
 
 CREATE TABLE tickets (
@@ -365,8 +357,8 @@ CREATE TABLE tickets (
     luggage_weight DECIMAL(10, 2),
     luggage_size VARCHAR(50),
     booking_reference VARCHAR(20) UNIQUE,
-    CONSTRAINT chk_date CHECK(purchase_date <= departure_date)
-    CONSTRAINT chk_luggage_weight CHECK (luggage_weight >= 0),
+    CONSTRAINT chk_pur_date CHECK(purchase_date <= departure_date),
+    CONSTRAINT chk_luggage_weight CHECK (luggage_weight >= 0)
 );
 
 CREATE TABLE locations (
@@ -395,7 +387,7 @@ CREATE TABLE flights (
     arrival_time DATE,
     route_id INT,
     plane_id INT UNIQUE,
-    status VARCHAR(50) DEFAULT 'Scheduled' CHECK (status IN ('Scheduled', 'Cancelled', 'Completed'))
+    status VARCHAR(50) DEFAULT 'Scheduled' CHECK (status IN ('Scheduled', 'Cancelled', 'Completed')),
     CONSTRAINT chk_time CHECK (departure_time <= arrival_time)
 );
 
@@ -415,7 +407,7 @@ CREATE TABLE discounts (
     start_date DATE,
     expiry_date DATE,
     description VARCHAR(255),
-    status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive'))
+    status VARCHAR(50) DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive')),
     CONSTRAINT chk_discount_time CHECK(start_date <= expiry_date)
 
 
