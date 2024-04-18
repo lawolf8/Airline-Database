@@ -104,6 +104,44 @@ BEGIN
     ) AS AuditLog (COLUMN_NAME, COLUMN_VALUE);
 END;
 
+CREATE TRIGGER tr_employees_update
+ON employees
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @date DATE = CAST(GETDATE() AS DATE);
+    DECLARE @time TIME = CAST(GETDATE() AS TIME);
+
+    INSERT INTO tb_audit (
+        aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
+    )
+    SELECT 
+        HOST_NAME(), 'UPDATE', @date, @time, SYSTEM_USER, 'employees', i.employee_id, COLUMN_NAME, COLUMN_VALUE_OLD, COLUMN_VALUE_NEW
+    FROM 
+        inserted i
+    JOIN 
+        deleted d ON i.employee_id = d.employee_id
+    CROSS APPLY (
+        VALUES 
+        ('employee_id', CAST(d.employee_id AS VARCHAR(MAX)), CAST(i.employee_id AS VARCHAR(MAX))),
+        ('first_name', d.first_name, i.first_name),
+        ('last_name', d.last_name, i.last_name),
+        ('birth_date', CONVERT(VARCHAR, d.birth_date, 120), CONVERT(VARCHAR, i.birth_date, 120)),
+        ('hire_date', CONVERT(VARCHAR, d.hire_date, 120), CONVERT(VARCHAR, i.hire_date, 120)),
+        ('email', d.email, i.email),
+        ('gender', d.gender, i.gender),
+        ('SSN', d.SSN, i.SSN),
+        ('phone_number', d.phone_number, i.phone_number),
+        ('address', d.address, i.address),
+        ('zipcode', d.zipcode, i.zipcode),
+        ('city', d.city, i.city),
+        ('state', d.state, i.state),
+        ('department', d.department, i.department),
+        ('position', d.position, i.position)
+    ) AS AuditLog (COLUMN_NAME, COLUMN_VALUE_OLD, COLUMN_VALUE_NEW)
+    WHERE COLUMN_VALUE_OLD <> COLUMN_VALUE_NEW;
+END;
 
 --4)---------------------------------------------------------------------------
 CREATE TRIGGER Restrict_FirstName_Length
