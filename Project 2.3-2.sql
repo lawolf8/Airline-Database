@@ -26,6 +26,7 @@ DEALLOCATE viewCursor
 -------------------------------------------------------------------
 
 --1)---------------------------------------------------------------
+GO
 CREATE OR ALTER TRIGGER Flights_Date_Restriction_On_Edit_Trigger
 ON flights
 AFTER INSERT, UPDATE
@@ -146,6 +147,138 @@ BEGIN
     END
 END;
 GO
+
+--5
+CREATE TABLE tb_audit
+(
+    aud_id INT IDENTITY,
+    aud_station VARCHAR(50),
+    aud_operation VARCHAR(50),
+    aud_date DATE,
+    aud_time TIME,
+    aud_username VARCHAR(50),
+    aud_table VARCHAR(50),
+    aud_identifier_id VARCHAR(50),
+    aud_column VARCHAR(50),
+    aud_before VARCHAR(MAX),
+    aud_after VARCHAR(MAX)
+);
+
+IF OBJECT_ID('dbo.tr_planes_insert', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_planes_insert;
+GO
+
+CREATE TRIGGER tr_planes_insert
+ON planes
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @date DATE = CAST(GETDATE() AS DATE);
+    DECLARE @time TIME = CAST(GETDATE() AS TIME);
+
+    INSERT INTO tb_audit (
+        aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
+    )
+    SELECT 
+        HOST_NAME(), 'INSERT', @date, @time, SYSTEM_USER, 'planes', inserted.plane_id, COLUMN_NAME, NULL, COLUMN_VALUE
+    FROM 
+        inserted
+    CROSS APPLY (
+        VALUES 
+        ('plane_id', CAST(plane_id AS VARCHAR(MAX))),
+        ('fabrication_date', CONVERT(VARCHAR, fabrication_date, 120)),
+        ('first_use_date', CONVERT(VARCHAR, first_use_date, 120)),
+        ('brand', brand),
+        ('model', model),
+        ('capacity', CAST(capacity AS VARCHAR(MAX)))
+    ) AS AuditLog (COLUMN_NAME, COLUMN_VALUE);
+END;
+GO
+
+IF OBJECT_ID('dbo.tr_planes_update', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_planes_update;
+GO
+CREATE TRIGGER tr_planes_update
+ON planes
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @date DATE = CAST(GETDATE() AS DATE);
+    DECLARE @time TIME = CAST(GETDATE() AS TIME);
+
+    INSERT INTO tb_audit (
+        aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
+    )
+    SELECT 
+        HOST_NAME(), 'UPDATE', @date, @time, SYSTEM_USER, 'planes', inserted.plane_id, COLUMN_NAME, DELETED_VALUE, INSERTED_VALUE
+    FROM 
+        inserted
+    JOIN 
+        deleted ON inserted.plane_id = deleted.plane_id
+    CROSS APPLY (
+        VALUES 
+        ('plane_id', CAST(deleted.plane_id AS VARCHAR(MAX)), CAST(inserted.plane_id AS VARCHAR(MAX))),
+        ('fabrication_date', CONVERT(VARCHAR, deleted.fabrication_date, 120), CONVERT(VARCHAR, inserted.fabrication_date, 120)),
+        ('first_use_date', CONVERT(VARCHAR, deleted.first_use_date, 120), CONVERT(VARCHAR, inserted.first_use_date, 120)),
+        ('brand', deleted.brand, inserted.brand),
+        ('model', deleted.model, inserted.model),
+        ('capacity', CAST(deleted.capacity AS VARCHAR(MAX)), CAST(inserted.capacity AS VARCHAR(MAX)))
+    ) AS AuditLog (COLUMN_NAME, DELETED_VALUE, INSERTED_VALUE)
+    WHERE DELETED_VALUE <> INSERTED_VALUE;
+END;
+GO
+
+IF OBJECT_ID('dbo.tr_planes_delete', 'TR') IS NOT NULL
+    DROP TRIGGER dbo.tr_planes_delete;
+GO
+CREATE TRIGGER tr_planes_delete
+ON planes
+AFTER DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    DECLARE @date DATE = CAST(GETDATE() AS DATE);
+    DECLARE @time TIME = CAST(GETDATE() AS TIME);
+
+    INSERT INTO tb_audit (
+        aud_station, aud_operation, aud_date, aud_time, aud_username, aud_table, aud_identifier_id, aud_column, aud_before, aud_after
+    )
+    SELECT 
+        HOST_NAME(), 'DELETE', @date, @time, SYSTEM_USER, 'planes', deleted.plane_id, COLUMN_NAME, COLUMN_VALUE, NULL
+    FROM 
+        deleted
+    CROSS APPLY (
+        VALUES 
+        ('plane_id', CAST(plane_id AS VARCHAR(MAX))),
+        ('fabrication_date', CONVERT(VARCHAR, fabrication_date, 120)),
+        ('first_use_date', CONVERT(VARCHAR, first_use_date, 120)),
+        ('brand', brand),
+        ('model', model),
+        ('capacity', CAST(capacity AS VARCHAR(MAX)))
+    ) AS AuditLog (COLUMN_NAME, COLUMN_VALUE);
+END;
+GO
+
+--6
+CREATE VIEW Top_100_Customers AS
+SELECT TOP 100
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    c.birth_date,
+    DATEDIFF(YEAR, c.birth_date, GETDATE()) AS current_age,
+    cs.name AS city_name
+FROM
+    customers c
+INNER JOIN
+    cities_states cs ON c.city_state_id = cs.city_state_id
+ORDER BY
+    current_age ASC,
+    c.birth_date DESC;
+GO
+
 --7
 CREATE VIEW Top_3_Routes_By_Weekday AS
 SELECT 
@@ -183,7 +316,8 @@ FROM (
 ) AS subquery
 WHERE 
     route_rank <= 3;
-	GO
+
+GO
 
 --8)-----------------------------------------------------------------------------
 CREATE VIEW Flights_By_City AS
@@ -205,7 +339,7 @@ GROUP BY
 ORDER BY 
     total_flights DESC
 OFFSET 0 ROWS FETCH FIRST 20 ROWS ONLY;
-
+GO
 
 --10)----------------------------------------------------------------------------
 CREATE TABLE employees (
