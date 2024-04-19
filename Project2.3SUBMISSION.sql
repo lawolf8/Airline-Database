@@ -604,7 +604,12 @@ BEGIN
 END;
 
 -- Drop constraint DF_AddressLine2 if it exists
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_NAME = 'DF_AddressLine2')
+IF EXISTS (
+    SELECT * 
+    FROM sys.default_constraints 
+    WHERE parent_object_id = OBJECT_ID('locations') 
+    AND name = 'DF_AddressLine2'
+)
 BEGIN
     ALTER TABLE locations
     DROP CONSTRAINT DF_AddressLine2;
@@ -619,9 +624,9 @@ ADD CONSTRAINT UQ_LocationID UNIQUE (location_id);
 ALTER TABLE locations
 ADD CONSTRAINT CHK_LocationType CHECK (location_type_id IN (1, 2, 3)); 
 -- 3. Default constraint on address_line2
---ALTER TABLE locations
---ADD CONSTRAINT DF_AddressLine2 DEFAULT 'N/A' FOR address_line2;
---select * from location_types
+ALTER TABLE locations
+ADD CONSTRAINT DF_AddressLine2 DEFAULT 'N/A' FOR address_line2;
+
 -------------------------------------------------------------------
 Alter table planes
 drop constraint CHK_FabricationDate
