@@ -371,9 +371,9 @@ CFlights AS (
         C.customer_id,
         C.city_state_id,
         F.flight_id
-    FROM flights F
-    JOIN tickets T ON f.flight_id = t.flight_id
-    JOIN CAge C ON T.customer_id = c.customer_id
+    FROM Flights F
+    JOIN Tickets T ON F.flight_id = T.flight_id
+    JOIN CAge C ON T.customer_id = C.customer_id
     WHERE YEAR(F.date) IN (2016, 2017)
 ),
 FlightData AS (
@@ -383,8 +383,8 @@ FlightData AS (
         COUNT(DISTINCT C.customer_id) AS number_of_customers,
         COUNT(DISTINCT C.flight_id) AS number_of_flights
     FROM CFlights C
-    JOIN cities_states CS ON C.city_state_id = CS.city_state_id
-    GROUP BY Cs.name, C.age_group
+    JOIN Cities_States CS ON C.city_state_id = CS.city_state_id
+    GROUP BY CS.name, C.age_group
 ),
 RankCities AS (
     SELECT
