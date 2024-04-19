@@ -405,6 +405,26 @@ ADD CONSTRAINT default_purchase_time DEFAULT '00:00:00' FOR purchase_time,
 ADD CONSTRAINT default_boarding_time DEFAULT '00:00:00' FOR boarding_time,
 ADD CONSTRAINT check_final_price CHECK (final_price >= 0);
 -------------------------------------------------------------------
+Alter table locations
+drop constraint UQ_LocationID
+Alter table locations
+drop constraint CHK_LocationType
+Alter table locations
+drop constraint DF_AddressLine2
+
+
+-- 1. Unique constraint on location_id
+ALTER TABLE locations
+ADD CONSTRAINT UQ_LocationID UNIQUE (location_id);
+
+-- 2. Check constraint on location_type_id
+ALTER TABLE locations
+ADD CONSTRAINT CHK_LocationType CHECK (location_type_id IN (1, 2, 3)); 
+-- 3. Default constraint on address_line2
+ALTER TABLE locations
+ADD CONSTRAINT DF_AddressLine2 DEFAULT 'N/A' FOR address_line2;
+select * from location_types
+-------------------------------------------------------------------
 Alter table planes
 drop constraint CHK_FabricationDate
 Alter table planes
