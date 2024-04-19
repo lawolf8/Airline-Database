@@ -404,7 +404,24 @@ ADD CONSTRAINT time_constraint CHECK (purchase_time <= boarding_time)
 ADD CONSTRAINT default_purchase_time DEFAULT '00:00:00' FOR purchase_time,
 ADD CONSTRAINT default_boarding_time DEFAULT '00:00:00' FOR boarding_time,
 ADD CONSTRAINT check_final_price CHECK (final_price >= 0);
-
+-------------------------------------------------------------------
+                    Alter Table flights
+                        drop constraint CHK_TimeRange
+                    Alter Table flights
+                        drop constraint DF_Date
+                    Alter Table flights
+                        drop constraint UQ_FlightID
+-- 1. CHECK Constraint
+ALTER TABLE flights
+ADD CONSTRAINT CHK_TimeRange CHECK (
+    start_time_actual >= '00:00' AND start_time_actual <= '23:59' AND
+    end_time_actual >= '00:00' AND end_time_actual <= '23:59' );
+-- 2. DEFAULT Constraint
+ALTER TABLE flights
+ADD CONSTRAINT DF_Date DEFAULT GETDATE() FOR date;
+--3 UNIQUE Constraint
+ALTER TABLE flights
+ADD CONSTRAINT UQ_FlightID UNIQUE (flight_id);
 -------------------------------------------------------------------
                     ALTER TABLE routes
                         DROP CONSTRAINT CHK_Time_Order;
