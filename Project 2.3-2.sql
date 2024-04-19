@@ -29,7 +29,7 @@ END
 
 CLOSE viewCursor
 DEALLOCATE viewCursor
--------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 --1)----------------------------------------------------------------------------
 GO
@@ -82,8 +82,6 @@ INSTEAD OF UPDATE
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    -- Check if the final_price update meets the requirement
     IF EXISTS (
         SELECT 1
         FROM inserted i
@@ -93,13 +91,11 @@ BEGIN
         WHERE ABS(i.final_price - rct.price) > (0.2 * rct.price)
     )
     BEGIN
-        -- If the requirement is not met, cancel the operation
         RAISERROR ('Final price cannot deviate more than 20% from the corresponding route and cabin type price.', 16, 1);
         ROLLBACK TRANSACTION;
     END
     ELSE
     BEGIN
-        -- If the requirement is met, perform the update
         UPDATE t
         SET t.final_price = i.final_price
         FROM tickets t
@@ -121,15 +117,11 @@ ON customers
 INSTEAD OF INSERT, UPDATE
 AS
 BEGIN
-    -- Check the length of first_name in inserted data
     DECLARE @MinLength INT, @MaxLength INT;
     SELECT @MinLength = MIN(LEN(first_name)), @MaxLength = MAX(LEN(first_name)) FROM inserted;
-
-    -- Get the shortest and longest length of first_name from existing data
     DECLARE @MinExistingLength INT, @MaxExistingLength INT;
     SELECT @MinExistingLength = MIN(LEN(first_name)), @MaxExistingLength = MAX(LEN(first_name)) FROM customers;
 
-    -- If the length of first_name in inserted data is outside the range of existing data, cancel the operation
     IF @MinLength < @MinExistingLength OR @MaxLength > @MaxExistingLength
     BEGIN
         RAISERROR ('Input or update of first_name values is restricted based on the length of existing data.', 16, 1);
@@ -137,17 +129,17 @@ BEGIN
     END
     ELSE
     BEGIN
-        -- If the length is within the range, perform the insert or update
+
         IF EXISTS (SELECT 1 FROM inserted)
         BEGIN
-            -- Insert the rows into the customers table
+
             INSERT INTO customers (customer_id, first_name, last_name, birth_date, start_date, email, gender, phone1, phone2, address_line1, address_line2, zipcode_id, city_state_id)
             SELECT customer_id, first_name, last_name, birth_date, start_date, email, gender, phone1, phone2, address_line1, address_line2, zipcode_id, city_state_id
             FROM inserted;
         END
         ELSE
         BEGIN
-            -- Update the rows in the customers table
+
             UPDATE c
             SET c.first_name = i.first_name
             FROM customers c
@@ -370,7 +362,7 @@ CFlights AS (
     SELECT
         CA.customer_id,
         CA.city_state_id,
-        CA.age_group,   -- Ensuring that age_group is selected here
+        CA.age_group,
         F.flight_id
     FROM flights F
     JOIN tickets T ON F.flight_id = T.flight_id
@@ -380,12 +372,12 @@ CFlights AS (
 FlightData AS (
     SELECT
         CS.name AS city_name,
-        CF.age_group,  -- Using age_group from CFlights
+        CF.age_group,
         COUNT(DISTINCT CF.customer_id) AS number_of_customers,
         COUNT(DISTINCT CF.flight_id) AS number_of_flights
     FROM CFlights CF
     JOIN cities_states CS ON CF.city_state_id = CS.city_state_id
-    GROUP BY CS.name, CF.age_group  -- Grouping by age_group here
+    GROUP BY CS.name, CF.age_group
 ),
 RankCities AS (
     SELECT
