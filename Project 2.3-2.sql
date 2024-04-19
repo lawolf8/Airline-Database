@@ -405,3 +405,19 @@ ADD CONSTRAINT default_purchase_time DEFAULT '00:00:00' FOR purchase_time,
 ADD CONSTRAINT default_boarding_time DEFAULT '00:00:00' FOR boarding_time,
 ADD CONSTRAINT check_final_price CHECK (final_price >= 0);
 
+
+ALTER TABLE routes
+DROP CONSTRAINT CHK_Time_Order;
+ALTER TABLE routes
+DROP CONSTRAINT UQ_route_id;
+ALTER TABLE routes
+DROP CONSTRAINT DF_Weekday;
+-- 1. Check Constraint
+ALTER TABLE routes
+ADD CONSTRAINT CHK_Time_Order CHECK (start_time < end_time);
+--2
+alter table routes
+Add constraint UQ_route_id UNIQUE (route_id)
+-- 3. Default Constraint
+ALTER TABLE routes
+ADD CONSTRAINT DF_Weekday DEFAULT 1 FOR weekday_id;
