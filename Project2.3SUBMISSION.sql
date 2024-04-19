@@ -456,6 +456,11 @@ BEGIN
     ALTER TABLE employees
     DROP CONSTRAINT check_zipcode_id;
 END;
+IF EXISTS (SELECT * FROM sys.default_constraints WHERE parent_object_id = OBJECT_ID('employees') AND name = 'default_employee_id_reports_to')
+BEGIN
+    ALTER TABLE employees
+    DROP CONSTRAINT default_employee_id_reports_to;
+END;
 -- 1. Unique constraint for employee_id
 ALTER TABLE employees
 ADD CONSTRAINT unique_employee_id UNIQUE (employee_id);
@@ -482,8 +487,8 @@ ALTER TABLE employees
 ADD CONSTRAINT check_zipcode_id CHECK (zipcode_id > 0);
 
 -- 7. Default constraint for employee_id_reports_to
---ALTER TABLE employees
---ADD CONSTRAINT default_employee_id_reports_to DEFAULT -1 FOR employee_id_reports_to;
+ALTER TABLE employees
+ADD CONSTRAINT default_employee_id_reports_to DEFAULT -1 FOR employee_id_reports_to;
 
 -- 8. Check constraint for job_position_id
 ALTER TABLE employees
