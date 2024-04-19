@@ -368,23 +368,24 @@ WITH CAge AS (
 ),
 CFlights AS (
     SELECT
-        C.customer_id,
-        C.city_state_id,
+        CA.customer_id,
+        CA.city_state_id,
+        CA.age_group,   -- Ensuring that age_group is selected here
         F.flight_id
-    FROM Flights F
-    JOIN Tickets T ON F.flight_id = T.flight_id
-    JOIN CAge C ON T.customer_id = C.customer_id
+    FROM flights F
+    JOIN tickets T ON F.flight_id = T.flight_id
+    JOIN CAge CA ON T.customer_id = CA.customer_id
     WHERE YEAR(F.date) IN (2016, 2017)
 ),
 FlightData AS (
     SELECT
         CS.name AS city_name,
-        C.age_group,
-        COUNT(DISTINCT C.customer_id) AS number_of_customers,
-        COUNT(DISTINCT C.flight_id) AS number_of_flights
-    FROM CFlights C
-    JOIN Cities_States CS ON C.city_state_id = CS.city_state_id
-    GROUP BY CS.name, C.age_group
+        CF.age_group,  -- Using age_group from CFlights
+        COUNT(DISTINCT CF.customer_id) AS number_of_customers,
+        COUNT(DISTINCT CF.flight_id) AS number_of_flights
+    FROM CFlights CF
+    JOIN cities_states CS ON CF.city_state_id = CS.city_state_id
+    GROUP BY CS.name, CF.age_group  -- Grouping by age_group here
 ),
 RankCities AS (
     SELECT
