@@ -436,7 +436,7 @@ BEGIN
     ALTER TABLE employees
     DROP CONSTRAINT CHK_HireDate;
 END;
-IF EXISTS (SELECT * FROM sys.check_constraints WHERE parent_object_id = OBJECT_ID('employees') AND name = 'unique_ssn')
+IF EXISTS (SELECT * FROM sys.objects WHERE parent_object_id = OBJECT_ID('employees') AND name = 'unique_ssn')
 BEGIN
     ALTER TABLE employees
     DROP CONSTRAINT unique_ssn;
@@ -459,8 +459,8 @@ ALTER TABLE employees
 ADD CONSTRAINT CHK_HireDate CHECK (hire_date < GETDATE());
 
 -- 4. Unique constraint for ssn
---ALTER TABLE employees
---ADD CONSTRAINT unique_ssn UNIQUE (ssn);
+ALTER TABLE employees
+ADD CONSTRAINT unique_ssn UNIQUE (ssn);
 
 -- 5. Default constraint for phone1
 --ALTER TABLE employees
