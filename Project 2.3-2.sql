@@ -379,31 +379,69 @@ ORDER BY
     age_group, num_customers_2016_2017 DESC, num_flights_2016 DESC, num_flights_2017 DESC;
 Go
 --10)----------------------------------------------------------------------------
+--1
+ALTER TABLE employees 
+    ADD CONSTRAINT unique_email UNIQUE (email);
+--2
+ALTER TABLE employees 
+    ADD CONSTRAINT check_gender CHECK (gender IN ('M', 'F'));
+--3
+ALTER TABLE employees 
+    ADD CONSTRAINT default_birth_date DEFAULT '1900-01-01' FOR birth_date;
+--4
+ALTER TABLE employees 
+    ADD CONSTRAINT unique_ssn UNIQUE (ssn);
+--5
+ALTER TABLE employees 
+    ADD CONSTRAINT default_phone1 DEFAULT 'N/A' FOR phone1;
+--6
+ALTER TABLE employees 
+    ADD CONSTRAINT check_zipcode_id CHECK (zipcode_id > 0);
+--7
 ALTER TABLE employees
-ADD CONSTRAINT unique_email UNIQUE (email),
-ADD CONSTRAINT check_gender CHECK (gender IN ('M', 'F')),
-ADD CONSTRAINT default_birth_date DEFAULT '1900-01-01' FOR birth_date,
-ADD CONSTRAINT unique_ssn UNIQUE (ssn),
-ADD CONSTRAINT default_phone1 DEFAULT 'N/A' FOR phone1,
-ADD CONSTRAINT check_zipcode_id CHECK (zipcode_id > 0),
-ADD CONSTRAINT default_employee_id_reports_to DEFAULT -1 FOR employee_id_reports_to;
+    ADD CONSTRAINT chk_phone CHECK (phone1 <> phone2);
+--8
+ALTER TABLE employees 
+    ADD CONSTRAINT unique_phone2 UNIQUE (phone2);
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+--1
+ALTER TABLE customers 
+    ADD CONSTRAINT unique_customer_id UNIQUE (customer_id),
+--2
+ALTER TABLE customers 
+    ADD CONSTRAINT unique_email1 UNIQUE (email),
+--3
+ALTER TABLE customers 
+    ADD CONSTRAINT check_gender1 CHECK (gender IN ('M', 'F')),
+--4
+ALTER TABLE customers 
+    ADD CONSTRAINT default_phone11 DEFAULT 'N/A' FOR phone1,
+--5
+ALTER TABLE customers 
+    ADD CONSTRAINT check_zipcode_id1 CHECK (zipcode_id > 0),
+--6
+ALTER TABLE customers 
+    ADD CONSTRAINT default_city_state_id DEFAULT -1 FOR city_state_id;
 
-ALTER TABLE customers
-ADD CONSTRAINT unique_customer_id UNIQUE (customer_id),
-ADD CONSTRAINT unique_email UNIQUE (email),
-ADD CONSTRAINT check_gender CHECK (gender IN ('M', 'F')),
-ADD CONSTRAINT default_phone1 DEFAULT 'N/A' FOR phone1,
-ADD CONSTRAINT check_zipcode_id CHECK (zipcode_id > 0),
-ADD CONSTRAINT default_city_state_id DEFAULT -1 FOR city_state_id;
-
-
-ALTER TABLE tickets
-ADD CONSTRAINT unique_ticket_id UNIQUE (ticket_id),
-ADD CONSTRAINT date_constraint CHECK (boarding_date >= purchase_date),
-ADD CONSTRAINT time_constraint CHECK (purchase_time <= boarding_time)
-ADD CONSTRAINT default_purchase_time DEFAULT '00:00:00' FOR purchase_time,
-ADD CONSTRAINT default_boarding_time DEFAULT '00:00:00' FOR boarding_time,
-ADD CONSTRAINT check_final_price CHECK (final_price >= 0);
+-----------------------------------------------------------------------------------------------------------------------------------------------
+--1
+ALTER TABLE tickets 
+    ADD CONSTRAINT unique_ticket_id UNIQUE (ticket_id);
+--2
+ALTER TABLE tickets 
+    ADD CONSTRAINT date_constraint CHECK (boarding_date >= purchase_date);
+--3
+ALTER TABLE tickets 
+    ADD CONSTRAINT time_constraint CHECK (purchase_time <= boarding_time);
+--4
+ALTER TABLE tickets 
+    ADD CONSTRAINT default_purchase_time DEFAULT '00:00:00' FOR purchase_time;
+--5
+ALTER TABLE tickets 
+    ADD CONSTRAINT default_boarding_time DEFAULT '00:00:00' FOR boarding_time;
+--6
+ALTER TABLE tickets 
+    ADD CONSTRAINT check_final_price CHECK (final_price >= 0);
 -------------------------------------------------------------------
 Alter table locations
 drop constraint UQ_LocationID
