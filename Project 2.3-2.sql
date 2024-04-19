@@ -457,22 +457,45 @@ ADD CONSTRAINT default_employee_id_reports_to DEFAULT -1 FOR employee_id_reports
 ALTER TABLE employees
 ADD CONSTRAINT check_job_position_id CHECK (job_position_id >= 1 AND job_position_id <= 50);
 -------------------------------------------------------------------------------------------------------------------------------------------------------
---1
+ALTER TABLE customers
+drop constraint unique_customer_id
+ALTER TABLE customers
+drop constraint unique_email1
+ALTER TABLE customers
+drop constraint check_gender1
+ALTER TABLE customers
+drop constraint  default_phone11
+ALTER TABLE customers
+drop constraint check_zipcode_id1
+ALTER TABLE customers
+drop constraint default_city_state_id
+
+
+
+
+
+
+-- 1. Unique constraint on customer_id
 ALTER TABLE customers 
     ADD CONSTRAINT unique_customer_id UNIQUE (customer_id);
---2
+
+-- 2. Unique constraint on email
 ALTER TABLE customers 
     ADD CONSTRAINT unique_email1 UNIQUE (email);
---3
+
+-- 3. Check constraint on gender
 ALTER TABLE customers 
     ADD CONSTRAINT check_gender1 CHECK (gender IN ('M', 'F'));
---4
+
+-- 4. Default constraint on phone1
 ALTER TABLE customers 
     ADD CONSTRAINT default_phone11 DEFAULT 'N/A' FOR phone1;
---5
+
+-- 5. Check constraint on zipcode_id
 ALTER TABLE customers 
     ADD CONSTRAINT check_zipcode_id1 CHECK (zipcode_id > 0);
---6
+
+-- 6. Default constraint on city_state_id
 ALTER TABLE customers 
     ADD CONSTRAINT default_city_state_id DEFAULT -1 FOR city_state_id;
 
