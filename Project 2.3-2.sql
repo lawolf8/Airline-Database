@@ -116,7 +116,6 @@ BEGIN
 END;
 GO
 
---6)----------------------------------------------------------------------------
 CREATE TRIGGER Restrict_FirstName_Length
 ON customers
 INSTEAD OF INSERT, UPDATE
