@@ -358,11 +358,11 @@ WITH CAge AS (
         customer_id,
         city_state_id,
         CASE
-            WHEN DATEDIFF(year, birth_date, GETDATE()) <= 25 THEN '25 or younger'
+            WHEN DATEDIFF(year, birth_date, GETDATE()) <= 25 THEN '25>'
             WHEN DATEDIFF(year, birth_date, GETDATE()) BETWEEN 26 AND 40 THEN '26 to 40'
             WHEN DATEDIFF(year, birth_date, GETDATE()) BETWEEN 41 AND 55 THEN '41 to 55'
             WHEN DATEDIFF(year, birth_date, GETDATE()) BETWEEN 56 AND 70 THEN '56 to 70'
-            ELSE '71 or older'
+            ELSE '71<'
         END AS age_group
     FROM customers
 ),
