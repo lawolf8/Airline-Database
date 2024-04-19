@@ -459,19 +459,19 @@ ADD CONSTRAINT check_job_position_id CHECK (job_position_id >= 1 AND job_positio
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 --1
 ALTER TABLE customers 
-    ADD CONSTRAINT unique_customer_id UNIQUE (customer_id),
+    ADD CONSTRAINT unique_customer_id UNIQUE (customer_id);
 --2
 ALTER TABLE customers 
-    ADD CONSTRAINT unique_email1 UNIQUE (email),
+    ADD CONSTRAINT unique_email1 UNIQUE (email);
 --3
 ALTER TABLE customers 
-    ADD CONSTRAINT check_gender1 CHECK (gender IN ('M', 'F')),
+    ADD CONSTRAINT check_gender1 CHECK (gender IN ('M', 'F'));
 --4
 ALTER TABLE customers 
-    ADD CONSTRAINT default_phone11 DEFAULT 'N/A' FOR phone1,
+    ADD CONSTRAINT default_phone11 DEFAULT 'N/A' FOR phone1;
 --5
 ALTER TABLE customers 
-    ADD CONSTRAINT check_zipcode_id1 CHECK (zipcode_id > 0),
+    ADD CONSTRAINT check_zipcode_id1 CHECK (zipcode_id > 0);
 --6
 ALTER TABLE customers 
     ADD CONSTRAINT default_city_state_id DEFAULT -1 FOR city_state_id;
