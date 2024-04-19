@@ -352,32 +352,58 @@ OFFSET 0 ROWS FETCH FIRST 20 ROWS ONLY;
 GO
 
 --9)----------------------------------------------------------------------------
-CREATE VIEW vw_nine AS
+CREATE VIEW Part_9 AS
+WITH CAge AS (
+    SELECT
+        customer_id,
+        city_state_id,
+        CASE
+            WHEN DATEDIFF(year, birth_date, GETDATE()) <= 25 THEN '25 or younger'
+            WHEN DATEDIFF(year, birth_date, GETDATE()) BETWEEN 26 AND 40 THEN '26 to 40'
+            WHEN DATEDIFF(year, birth_date, GETDATE()) BETWEEN 41 AND 55 THEN '41 to 55'
+            WHEN DATEDIFF(year, birth_date, GETDATE()) BETWEEN 56 AND 70 THEN '56 to 70'
+            ELSE '71 or older'
+        END AS age_group
+    FROM customers
+),
+CFlights AS (
+    SELECT
+        C.customer_id,
+        C.city_state_id,
+        F.flight_id
+    FROM flights F
+    JOIN tickets T ON f.flight_id = t.flight_id
+    JOIN CAge C ON T.customer_id = c.customer_id
+    WHERE YEAR(F.date) IN (2016, 2017)
+),
+FlightData AS (
+    SELECT
+        CS.name AS city_name,
+        C.age_group,
+        COUNT(DISTINCT C.customer_id) AS number_of_customers,
+        COUNT(DISTINCT C.flight_id) AS number_of_flights
+    FROM CFlights C
+    JOIN cities_states CS ON C.city_state_id = CS.city_state_id
+    GROUP BY Cs.name, C.age_group
+),
+RankCities AS (
+    SELECT
+        city_name,
+        age_group,
+        number_of_customers,
+        number_of_flights,
+        RANK() OVER (PARTITION BY age_group ORDER BY number_of_customers DESC, number_of_flights DESC) AS city_rank
+    FROM FlightData
+)
 SELECT
- c.name,
- SUM(CASE WHEN f.flight_year = 2016 THEN 1 ELSE 0 END) AS num_flights_2016,
- SUM(CASE WHEN f.flight_year = 2017 THEN 1 ELSE 0 END) AS num_flights_2017,
- COUNT(DISTINCT c.customer_id) AS num_customers,
- CASE
-  WHEN c.customer_age <= 25 THEN '25 or younger'
-  WHEN c.customer_age BETWEEN 26 AND 40 THEN '26 to 40'
-  WHEN c.customer_age BETWEEN 41 AND 55 THEN '41 to 55'
-  WHEN c.customer_age BETWEEN 56 AND 70 THEN '56 to 70'
-  ELSE '71 or older'
- END AS age_group
-FROM 
-    customers c
-JOIN 
-    addresses a ON c.address_id = a.address_id
-JOIN 
-    cities_states cs ON a.city_state_id = cs.city_state_id
-JOIN 
-    flights f ON c.customer_id = f.customer_id
-GROUP BY 
-    c.customer_id, cs.name, c.customer_age
-ORDER BY 
-    age_group, num_customers_2016_2017 DESC, num_flights_2016 DESC, num_flights_2017 DESC;
-Go
+    city_name,
+    number_of_customers,
+    number_of_flights,
+    age_group
+FROM RankCities
+WHERE city_rank <= 3;
+GO
+
 --10)----------------------------------------------------------------------------
 --1
 ALTER TABLE employees 
