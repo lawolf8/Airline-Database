@@ -406,30 +406,56 @@ WHERE city_rank <= 3;
 GO
 
 --10)----------------------------------------------------------------------------
---1
-ALTER TABLE employees 
-    ADD CONSTRAINT unique_email UNIQUE (email);
---2
-ALTER TABLE employees 
-    ADD CONSTRAINT check_gender CHECK (gender IN ('M', 'F'));
---3
-ALTER TABLE employees 
-    ADD CONSTRAINT default_birth_date DEFAULT '1900-01-01' FOR birth_date;
---4
-ALTER TABLE employees 
-    ADD CONSTRAINT unique_ssn UNIQUE (ssn);
---5
-ALTER TABLE employees 
-    ADD CONSTRAINT default_phone1 DEFAULT 'N/A' FOR phone1;
---6
-ALTER TABLE employees 
-    ADD CONSTRAINT check_zipcode_id CHECK (zipcode_id > 0);
---7
+
+alter table employees
+drop constraint unique_employee_id
+alter table employees
+drop constraint check_gender
+alter table employees
+drop constraint CHK_HireDate
+alter table employees
+drop constraint unique_ssn
+alter table employees
+drop constraint CHK_Phone1Length
+alter table employees
+drop constraint check_zipcode_id
+alter table employees
+drop constraint default_employee_id_reports_to
+alter table employees
+drop constraint check_job_position_id
+
+-- 1. Unique constraint for employee_id
 ALTER TABLE employees
-    ADD CONSTRAINT chk_phone CHECK (phone1 <> phone2);
---8
-ALTER TABLE employees 
-    ADD CONSTRAINT unique_phone2 UNIQUE (phone2);
+ADD CONSTRAINT unique_employee_id UNIQUE (employee_id);
+
+-- 2. Check constraint for gender
+ALTER TABLE employees
+ADD CONSTRAINT check_gender CHECK (gender IN ('M', 'F'));
+
+-- 3. Default constraint for birth_date
+ALTER TABLE employees
+ADD CONSTRAINT CHK_HireDate CHECK (hire_date < GETDATE());
+
+-- 4. Unique constraint for ssn
+ALTER TABLE employees
+ADD CONSTRAINT unique_ssn UNIQUE (ssn);
+
+-- 5. Default constraint for phone1
+ALTER TABLE employees
+ADD CONSTRAINT CHK_Phone1Length
+CHECK (LEN(phone1) <= 50);
+
+-- 6. Check constraint for zipcode_id
+ALTER TABLE employees
+ADD CONSTRAINT check_zipcode_id CHECK (zipcode_id > 0);
+
+-- 7. Default constraint for employee_id_reports_to
+ALTER TABLE employees
+ADD CONSTRAINT default_employee_id_reports_to DEFAULT -1 FOR employee_id_reports_to;
+
+-- 8. Check constraint for job_position_id
+ALTER TABLE employees
+ADD CONSTRAINT check_job_position_id CHECK (job_position_id >= 1 AND job_position_id <= 50);
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 --1
 ALTER TABLE customers 
