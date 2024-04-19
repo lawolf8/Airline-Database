@@ -451,6 +451,11 @@ BEGIN
     ALTER TABLE employees
     DROP CONSTRAINT CHK_Phone1Length;
 END;
+IF EXISTS (SELECT * FROM sys.check_constraints WHERE parent_object_id = OBJECT_ID('employees') AND name = 'check_zipcode_id')
+BEGIN
+    ALTER TABLE employees
+    DROP CONSTRAINT check_zipcode_id;
+END;
 -- 1. Unique constraint for employee_id
 ALTER TABLE employees
 ADD CONSTRAINT unique_employee_id UNIQUE (employee_id);
@@ -473,8 +478,8 @@ ADD CONSTRAINT CHK_Phone1Length
 CHECK (LEN(phone1) <= 50);
 
 -- 6. Check constraint for zipcode_id
---ALTER TABLE employees
---ADD CONSTRAINT check_zipcode_id CHECK (zipcode_id > 0);
+ALTER TABLE employees
+ADD CONSTRAINT check_zipcode_id CHECK (zipcode_id > 0);
 
 -- 7. Default constraint for employee_id_reports_to
 --ALTER TABLE employees
