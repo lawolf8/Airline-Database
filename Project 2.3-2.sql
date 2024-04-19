@@ -405,6 +405,25 @@ ADD CONSTRAINT default_purchase_time DEFAULT '00:00:00' FOR purchase_time,
 ADD CONSTRAINT default_boarding_time DEFAULT '00:00:00' FOR boarding_time,
 ADD CONSTRAINT check_final_price CHECK (final_price >= 0);
 -------------------------------------------------------------------
+Alter table planes
+drop constraint CHK_FabricationDate
+Alter table planes
+drop constraint  DF_Brand
+Alter table planes
+drop constraint UQ_PlaneID
+
+-- 1. CHECK Constraint
+ALTER TABLE planes
+ADD CONSTRAINT CHK_FabricationDate CHECK (fabrication_date <= first_use_date);
+
+-- 2. DEFAULT Constraint
+ALTER TABLE planes
+ADD CONSTRAINT DF_Brand DEFAULT ('Unknown') FOR brand;
+
+-- 3. UNIQUE Constraint
+ALTER TABLE planes
+ADD CONSTRAINT UQ_PlaneID UNIQUE (plane_id);
+-------------------------------------------------------------------
                     Alter Table flights
                         drop constraint CHK_TimeRange
                     Alter Table flights
