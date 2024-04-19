@@ -451,24 +451,45 @@ ALTER TABLE customers
     ADD CONSTRAINT default_city_state_id DEFAULT -1 FOR city_state_id;
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
---1
-ALTER TABLE tickets 
-    ADD CONSTRAINT unique_ticket_id UNIQUE (ticket_id);
---2
-ALTER TABLE tickets 
-    ADD CONSTRAINT date_constraint CHECK (boarding_date >= purchase_date);
---3
-ALTER TABLE tickets 
-    ADD CONSTRAINT time_constraint CHECK (purchase_time <= boarding_time);
---4
-ALTER TABLE tickets 
-    ADD CONSTRAINT default_purchase_time DEFAULT '00:00:00' FOR purchase_time;
---5
-ALTER TABLE tickets 
-    ADD CONSTRAINT default_boarding_time DEFAULT '00:00:00' FOR boarding_time;
---6
-ALTER TABLE tickets 
-    ADD CONSTRAINT check_final_price CHECK (final_price >= 0);
+alter table tickets
+drop constraint unique_ticket_id --1
+alter table tickets
+drop constraint check_purchase_date --2
+alter table tickets
+drop constraint default_purchase_time --3
+alter table tickets
+drop constraint check_final_price --4
+alter table tickets
+drop constraint check_discount_id --5
+
+alter table tickets
+drop constraint check_payment_type_id --6
+
+
+
+-- 1. Unique constraint for ticket_id
+ALTER TABLE tickets
+ADD CONSTRAINT unique_ticket_id UNIQUE (ticket_id);
+
+-- 2. Check constraint for purchase_date to ensure it's not in the future
+ALTER TABLE tickets
+ADD CONSTRAINT check_purchase_date CHECK (purchase_date <= GETDATE());
+
+-- 3. Default constraint for purchase_time to set it to the current time
+ALTER TABLE tickets
+ADD CONSTRAINT default_purchase_time DEFAULT GETDATE() FOR purchase_time;
+
+-- 4. Check constraint for final_price to ensure it's non-negative
+ALTER TABLE tickets
+ADD CONSTRAINT check_final_price CHECK (final_price >= 0);
+
+-- 5. Unique constraint for flight_id, customer_id, and purchase_date combination
+Alter table tickets
+add constraint check_discount_id Check (discount_id between 0 and 5)
+
+-- 6. Check constraint for payment_type_id to ensure it's within a specific range
+ALTER TABLE tickets
+ADD CONSTRAINT check_payment_type_id CHECK (payment_type_id BETWEEN 1 AND 10);
 -------------------------------------------------------------------
 Alter table locations
 drop constraint UQ_LocationID
